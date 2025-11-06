@@ -30,7 +30,7 @@ def verify_user_login(tutor_id, password):
             # Asumiendo que el campo para el login es 'tutor_id' y 'descripcion'
             
             # Estas dos líneas deben estar indentadas dentro del bloque try:
-            query = "SELECT id, tipo FROM usuarios WHERE tutor_id = %s AND descripcion = %s" 
+            query = "SELECT id, rol FROM usuarios WHERE id = %s AND contrasena = %s" 
             cursor.execute(query, (tutor_id, password))
             
             result = cursor.fetchone()

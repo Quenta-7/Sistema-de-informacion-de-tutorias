@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Principal - Sistema de Tutorías</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Barra superior -->
+    <header class="bg-blue-700 text-white shadow-md">
+        <div class="container mx-auto flex justify-between items-center px-6 py-4">
+            <h1 class="text-lg font-bold">Sistema de Tutorías - UNSAAC</h1>
+            <button 
+                id="logout-btn"
+                class="bg-red-500 hover:bg-red-600 text-sm px-4 py-2 rounded-lg transition">
+                Cerrar Sesión
+            </button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 flex items-center justify-center p-6">
+        <div class="bg-white shadow-lg rounded-2xl p-10 w-full max-w-lg text-center space-y-6">
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                class="w-16 h-16 mx-auto text-blue-600" 
+                fill="currentColor" 
+                viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zm0 13l-10-5v6l10 5 10-5v-6l-10 5zm0-3l-7-3.5 7-3.5 7 3.5-7 3.5z"/>
+            </svg>
+
+            <h2 class="text-2xl font-bold text-gray-800">¡Bienvenido al Panel Principal!</h2>
+
+            <p id="user-info" class="text-gray-600 text-lg">
+                Cargando información de usuario...
+            </p>
+
+            <div class="space-y-3">
+                <a href="#" 
+                   id="btn-gestion" 
+                   class="hidden bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium transition">
+                   Gestión de Tutorías
+                </a>
+                <a href="#" 
+                   id="btn-reportes" 
+                   class="hidden bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-medium transition">
+                   Ver Reportes
+                </a>
+                <a href="#" 
+                   id="btn-usuarios" 
+                   class="hidden bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-lg font-medium transition">
+                   Administración de Usuarios
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página -->
+    <footer class="bg-gray-100 text-center py-4 text-sm text-gray-500">
+        Desarrollo Semestral IF611A/B – Universidad Nacional de San Antonio Abad del Cusco
+    </footer>
+
+    <script>
+        // ============================
+        // DASHBOARD LOGIC
+        // ============================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = document.getElementById('user-info');
+            const btnGestion = document.getElementById('btn-gestion');
+            const btnReportes = document.getElementById('btn-reportes');
+            const btnUsuarios = document.getElementById('btn-usuarios');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            // Recuperar los datos del usuario del localStorage
+            const userData = JSON.parse(localStorage.getItem('userData'));
+
+            if (!userData) {
+                // Si no hay datos, volver al login
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Mostrar datos del usuario
+            userInfo.textContent = `Usuario ID: ${userData.id} | Rol: ${userData.rol}`;
+
+            // Mostrar opciones según el rol
+            if (userData.rol === 'tutor') {
+                btnGestion.classList.remove('hidden');
+            } else if (userData.rol === 'administrador') {
+                btnGestion.classList.remove('hidden');
+                btnReportes.classList.remove('hidden');
+                btnUsuarios.classList.remove('hidden');
+            } else {
+                btnReportes.classList.remove('hidden');
+            }
+
+            // Botón de cerrar sesión
+            logoutBtn.addEventListener('click', function() {
+                localStorage.removeItem('userData');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+
+</body>
+</html>
