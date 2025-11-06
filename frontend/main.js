@@ -65,8 +65,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (result.user.rol === 'administrador') {
                         destino = `${window.location.origin}/frontend/dashboard.html`;
                     } else if (result.user.rol === 'tutor') {
-                        destino = `${window.location.origin}/frontend/tutor_dashboard.html`;
-                    } else {
+                        destino = `${window.location.origin}/frontend/dashboard_tutor.html`;
+                    } 
+                    else if (result.user.rol === 'estudiante') {
+                        destino = `${window.location.origin}/frontend/dashboard_estudiante.html`;
+                    } 
+                    else {
                         destino = `${window.location.origin}/frontend/home.html`;
                     }
 
