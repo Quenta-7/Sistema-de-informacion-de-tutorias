@@ -45,7 +45,7 @@ Este sistema tiene como propósito digitalizar y gestionar los procesos de tutor
 
 ---
 
-## ⚙️ TECNOLOGÍAS SUGERIDAS
+## ⚙️ TECNOLOGÍAS
 - **Backend:** Python (Flask)  
 - **Frontend:** HTML, CSS, JavaScript, Bootstrap o Tailwind  
 - **Base de Datos:** MySQL / PostgreSQL  
