@@ -70,10 +70,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     else if (result.user.rol === 'estudiante') {
                         destino = `${window.location.origin}/frontend/dashboard_estudiante.html`;
                     } 
+                    else if (result.user.rol === 'verificador'){
+                        destino = `${window.location.origin}/fronted/dashboard_verificador.html`;
+                    }
                     else {
                         destino = `${window.location.origin}/frontend/home.html`;
                     }
-
+                    
                     console.log("Redirigiendo a:", destino);
                     window.location.href = destino;
                 }, 1500); // 1.5 segundos para mostrar el mensaje de éxito
