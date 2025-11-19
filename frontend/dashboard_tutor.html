@@ -1,48 +1,677 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="antialiased">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel del Tutor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Panel del Tutor — Dashboard</title>
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Small tweak to smooth transitions when toggling dark mode */
+    .theme-transition { transition: background-color .25s, color .25s; }
+    /* Simple scrollbar styling */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+  </style>
 </head>
-<body class="bg-blue-50 min-h-screen flex flex-col">
-  <header class="bg-blue-700 text-white py-4 shadow-md">
-    <h1 class="text-center text-2xl font-bold">Panel del Tutor</h1>
-  </header>
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100 theme-transition">
 
-  <main class="flex-grow flex flex-col items-center justify-center space-y-4">
-    <h2 class="text-xl font-semibold text-gray-700">Bienvenido, <span id="nombre-usuario">Tutor</span></h2>
-    <p class="text-gray-600">Rol: <span id="rol-usuario"></span></p>
+  <!-- Layout wrapper -->
+  <div id="app" class="min-h-screen flex">
 
-    <div class="bg-white p-6 rounded-lg shadow-md w-80 text-center">
-      <h3 class="text-lg font-semibold mb-2">Funciones del Tutor</h3>
-      <ul class="text-gray-600 list-disc text-left pl-6">
-        <li>Registrar sesiones de tutoría</li>
-        <li>Ver historial de tutorías</li>
-        <li>Consultar estudiantes asignados</li>
-      </ul>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 hidden md:block">
+      <div class="flex items-center gap-3 px-2 mb-6">
+        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-lg">
+          T
+        </div>
+        <div>
+          <h1 class="text-lg font-bold">Panel del Tutor</h1>
+          <p id="sidebar-rol" class="text-sm text-gray-500 dark:text-gray-300"></p>
+        </div>
+      </div>
+
+      <nav class="space-y-1 text-sm">
+        <a href="#/dashboard" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <!-- Home icon -->
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9.75L12 4l9 5.75V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.75z"/></svg>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#/registrar" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Registrar Tutorías</span>
+        </a>
+
+        <a href="#/historial" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V8"/></svg>
+          <span>Historial</span>
+        </a>
+
+        <a href="#/estudiantes" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11c1.657 0 3-1.567 3-3.5S17.657 4 16 4s-3 1.567-3 3.5S14.343 11 16 11zM8 11c1.657 0 3-1.567 3-3.5S9.657 4 8 4 5 5.567 5 7.5 6.343 11 8 11zM2 20a6 6 0 0 1 12 0"/></svg>
+          <span>Estudiantes</span>
+        </a>
+
+        <a href="#/cronograma" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 0 0 2-2V8H3v11a2 2 0 0 0 2 2z"/></svg>
+          <span>Cronograma</span>
+        </a>
+
+        <a id="pdf-link" target="_blank" href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf"
+           class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v6h6M7 21h10a2 2 0 0 0 2-2V7l-5-5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2z"/></svg>
+          <span>Documentación (PDF)</span>
+        </a>
+
+        <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
+
+        <a href="#/settings" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
+          <span>Configuración</span>
+        </a>
+
+        <button id="logout-desktop" class="w-full text-left mt-4 p-2 text-sm rounded hover:bg-red-50 dark:hover:bg-red-700 flex items-center gap-3 text-red-600 dark:text-red-400">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8v8"/></svg>
+          Cerrar sesión
+        </button>
+      </nav>
+
+      <!-- Footer quick actions -->
+      <div class="mt-6 text-xs text-gray-500 dark:text-gray-400">
+        <p>Atajo: <span class="font-medium">R</span> registra nueva tutoría</p>
+      </div>
+    </aside>
+
+    <!-- MOBILE TOPBAR -->
+    <div class="flex-1 flex flex-col">
+      <header class="flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 md:hidden">
+        <button id="btn-open-sidebar" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        <div class="flex items-center gap-3">
+          <button id="btn-theme-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
+            <svg id="icon-theme-mobile" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
+          </button>
+
+          <div class="text-sm text-gray-700 dark:text-gray-200">
+            <div id="topbar-usuario" class="font-semibold">Tutor</div>
+            <div id="topbar-rol" class="text-xs text-gray-500 dark:text-gray-400"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN TOPBAR (desktop) -->
+      <div class="hidden md:flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center gap-4">
+          <h2 id="page-title" class="text-2xl font-bold">Dashboard</h2>
+          <span id="page-sub" class="text-sm text-gray-500 dark:text-gray-300">Resumen rápido</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="btn-theme" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
+            <svg id="icon-theme" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
+          </button>
+
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <div id="user-name-top" class="font-semibold">Tutor</div>
+              <div id="user-role-top" class="text-xs text-gray-500 dark:text-gray-400"></div>
+            </div>
+            <div>
+              <img id="avatar" src="" alt="avatar" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT AREA -->
+      <main class="p-6">
+        <!-- Cards row -->
+        <section id="panel-dashboard" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías hoy</p>
+                  <p id="count-today" class="text-2xl font-bold">0</p>
+                </div>
+                <div class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/30">
+                  <!-- icon -->
+                  <svg class="w-6 h-6 text-blue-600 dark:text-blue-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 0 0 2-2V8H3v11a2 2 0 0 0 2 2z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías este mes</p>
+              <p id="count-month" class="text-2xl font-bold">0</p>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorados asignados</p>
+              <p id="count-students" class="text-2xl font-bold">0</p>
+            </div>
+
+            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
+              <p class="text-xs text-gray-500 dark:text-gray-400">Pendientes</p>
+              <p id="count-pending" class="text-2xl font-bold">0</p>
+            </div>
+          </div>
+
+          <!-- Interactive area: Registrar tutoría quick form -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Form -->
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 class="text-lg font-semibold mb-3">Registrar Tutoría (rápida)</h3>
+              <form id="quick-form" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <input id="tf-student" type="text" placeholder="Nombre del estudiante" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" required />
+                  <select id="tf-type" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
+                    <option value="academica">Académica</option>
+                    <option value="personal">Personal</option>
+                    <option value="profesional">Profesional</option>
+                  </select>
+                </div>
+                <textarea id="tf-notes" rows="3" placeholder="Observaciones / notas" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent"></textarea>
+
+                <div class="flex items-center gap-3">
+                  <input id="tf-date" type="date" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
+                  <button type="submit" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Registrar</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Recent actions -->
+            <aside class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+              <h4 class="font-semibold mb-3">Acciones recientes</h4>
+              <ul id="recent-actions" class="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                <li>No hay acciones recientes</li>
+              </ul>
+            </aside>
+          </div>
+
+          <!-- Table / students list -->
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold">Estudiantes asignados</h3>
+              <div class="text-sm text-gray-500 dark:text-gray-300">Total: <span id="total-students">0</span></div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
+                  <tr>
+                    <th class="px-3 py-2">#</th>
+                    <th class="px-3 py-2">Nombre</th>
+                    <th class="px-3 py-2">Código</th>
+                    <th class="px-3 py-2">Carrera</th>
+                    <th class="px-3 py-2">Última tutoría</th>
+                    <th class="px-3 py-2">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="students-tbody" class="text-gray-700 dark:text-gray-200">
+                  <tr>
+                    <td class="p-3" colspan="6">No hay estudiantes cargados. Usa el formulario para agregar uno rápido.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Registrar page (hash route) -->
+        <section id="panel-registrar" class="hidden space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Registrar Tutoría (completa)</h3>
+            <form id="full-form" class="space-y-3">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input id="full-student" type="text" placeholder="Nombre del estudiante" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" required />
+                <input id="full-code" type="text" placeholder="Código / matrícula" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <select id="full-type" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
+                  <option value="academica">Académica</option>
+                  <option value="personal">Personal</option>
+                  <option value="profesional">Profesional</option>
+                </select>
+                <input id="full-date" type="datetime-local" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
+              </div>
+
+              <textarea id="full-notes" rows="6" placeholder="Describa la tutoría, actividades, referencias, observaciones" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent"></textarea>
+
+              <div class="flex items-center gap-3">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar Tutoría</button>
+                <button id="btn-clear-full" type="button" class="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded hover:opacity-90">Limpiar</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Historial -->
+        <section id="panel-historial" class="hidden space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Historial de Tutorías</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-300">Filtro rápido:</p>
+            <div class="flex gap-3 mt-3 mb-4">
+              <input id="hist-filtro" type="text" placeholder="Buscar por estudiante o nota" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
+              <button id="hist-search" class="bg-blue-600 text-white px-4 py-2 rounded">Buscar</button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
+                  <tr>
+                    <th class="px-3 py-2">Fecha</th>
+                    <th class="px-3 py-2">Estudiante</th>
+                    <th class="px-3 py-2">Tipo</th>
+                    <th class="px-3 py-2">Notas</th>
+                  </tr>
+                </thead>
+                <tbody id="history-tbody" class="text-gray-700 dark:text-gray-200">
+                  <tr><td class="p-3" colspan="4">No hay registros aún.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Estudiantes -->
+        <section id="panel-estudiantes" class="hidden">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Administrar Estudiantes</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-300">Aquí puedes consultar, editar o exportar la lista de tus tutorados.</p>
+            <!-- For the demo we keep this area simple -->
+            <div class="mt-4">
+              <button id="btn-export" class="bg-indigo-600 text-white px-4 py-2 rounded">Exportar CSV</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cronograma -->
+        <section id="panel-cronograma" class="hidden">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-xl font-semibold mb-3">Cronograma de Tutorías</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-300">Vista por semana / mes (demo simple).</p>
+            <div id="cronograma-calendar" class="mt-4">
+              <!-- Placeholder calendar -->
+              <div class="p-6 border rounded border-dashed border-gray-200 dark:border-gray-700 text-center text-sm">
+                Calendario / Cronograma (implementar vista real según backend)
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Configuración -->
+        <section id="panel-settings" class="hidden">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 class="text-lg font-semibold mb-3">Configuración</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Tema</p>
+                <div class="flex items-center gap-3">
+                  <button id="btn-theme-settings" class="px-3 py-2 rounded border">Alternar tema</button>
+                  <span id="theme-status" class="text-sm text-gray-600 dark:text-gray-300"></span>
+                </div>
+              </div>
+
+              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
+                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Perfil</p>
+                <div class="text-sm">
+                  <p><strong id="profile-name">Tutor</strong></p>
+                  <p id="profile-role" class="text-gray-500 dark:text-gray-300">Rol</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
     </div>
+  </div>
 
-    <button id="logout" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-      Cerrar Sesión
-    </button>
-  </main>
+  <!-- MOBILE SIDEBAR (overlay) -->
+  <div id="mobile-sidebar" class="fixed inset-0 z-40 bg-black/40 hidden">
+    <div class="w-72 bg-white dark:bg-gray-800 h-full p-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded bg-blue-600 flex items-center justify-center text-white">T</div>
+          <div>
+            <div id="m-name" class="font-semibold">Tutor</div>
+            <div id="m-role" class="text-xs text-gray-500 dark:text-gray-300">Rol</div>
+          </div>
+        </div>
+        <button id="btn-close-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
 
+      <nav class="flex flex-col gap-2">
+        <a href="#/dashboard" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+        <a href="#/registrar" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Registrar Tutoría</a>
+        <a href="#/historial" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Historial</a>
+        <a href="#/estudiantes" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Estudiantes</a>
+        <a href="#/cronograma" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Cronograma</a>
+        <a href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf" target="_blank" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Documentación</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script>
-  const user = JSON.parse(localStorage.getItem('userData'));
-  if (!user) {
-    window.location.href = 'index.html';
-  } else {
-    document.getElementById('nombre-usuario').textContent = user.id;
-    document.getElementById('rol-usuario').textContent = user.rol;
-  }
+    // ---------- Simple client-side "router" (hash-based) ----------
+    const sections = {
+      '/dashboard': document.getElementById('panel-dashboard'),
+      '/registrar': document.getElementById('panel-registrar'),
+      '/historial': document.getElementById('panel-historial'),
+      '/estudiantes': document.getElementById('panel-estudiantes'),
+      '/cronograma': document.getElementById('panel-cronograma'),
+      '/settings': document.getElementById('panel-settings')
+    };
 
-  document.getElementById('logout').addEventListener('click', () => {
-    localStorage.removeItem('userData');
-    window.location.href = '/';
-  });
-</script>
+    function showRoute(route) {
+      // default
+      const r = route || '/dashboard';
+      // hide all
+      Object.values(sections).forEach(s => s && s.classList.add('hidden'));
+      // show chosen
+      if (sections[r]) sections[r].classList.remove('hidden');
 
+      // update title
+      const titleMap = {
+        '/dashboard': ['Dashboard', 'Resumen rápido'],
+        '/registrar': ['Registrar Tutoría', 'Ingrese detalles'],
+        '/historial': ['Historial', 'Registros de tutorías'],
+        '/estudiantes': ['Estudiantes', 'Lista de tutorados'],
+        '/cronograma': ['Cronograma', 'Fechas programadas'],
+        '/settings': ['Configuración', 'Preferencias']
+      };
+      const t = titleMap[r] || ['Panel', ''];
+      document.getElementById('page-title').textContent = t[0];
+      document.getElementById('page-sub').textContent = t[1];
+      // set active nav link style (simple)
+      document.querySelectorAll('.nav-link').forEach(a => {
+        a.classList.remove('bg-gray-100', 'dark:bg-gray-700', 'font-semibold');
+        const href = a.getAttribute('href') || '';
+        if (href.endsWith(r)) {
+          a.classList.add('bg-gray-100', 'dark:bg-gray-700', 'font-semibold');
+        }
+      });
+    }
+
+    function onHashChange() {
+      const hash = location.hash.replace('#', '') || '/dashboard';
+      showRoute(hash);
+    }
+    window.addEventListener('hashchange', onHashChange);
+    onHashChange(); // initial
+
+    // ---------- Sidebar mobile toggle ----------
+    const mobileSidebar = document.getElementById('mobile-sidebar');
+    document.getElementById('btn-open-sidebar').addEventListener('click', () => {
+      mobileSidebar.classList.remove('hidden');
+    });
+    document.getElementById('btn-close-mobile').addEventListener('click', () => {
+      mobileSidebar.classList.add('hidden');
+    });
+    mobileSidebar.addEventListener('click', (e) => {
+      if (e.target === mobileSidebar) mobileSidebar.classList.add('hidden');
+    });
+
+    // Desktop logout
+    document.getElementById('logout-desktop').addEventListener('click', () => {
+      localStorage.removeItem('userData');
+      window.location.href = '/';
+    });
+
+    // ---------- Theme (dark mode) ----------
+    const root = document.documentElement;
+    const themeKey = 'tutor_theme';
+    function setTheme(dark) {
+      if (dark) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-status').textContent = 'Oscuro';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('theme-status').textContent = 'Claro';
+      }
+      // update icons
+      updateThemeIcons(dark);
+      localStorage.setItem(themeKey, dark ? 'dark' : 'light');
+    }
+
+    function updateThemeIcons(isDark) {
+      const iconPaths = {
+        dark: '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
+        light: '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636"/>'
+      };
+      const iconTheme = document.getElementById('icon-theme');
+      const iconThemeMobile = document.getElementById('icon-theme-mobile');
+      if (isDark) {
+        iconTheme.innerHTML = iconPaths.dark;
+        iconThemeMobile.innerHTML = iconPaths.dark;
+      } else {
+        iconTheme.innerHTML = iconPaths.light;
+        iconThemeMobile.innerHTML = iconPaths.light;
+      }
+    }
+
+    // init theme from localStorage or system
+    const savedTheme = localStorage.getItem(themeKey);
+    if (savedTheme) setTheme(savedTheme === 'dark');
+    else {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark);
+    }
+
+    document.getElementById('btn-theme').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      setTheme(isDark);
+    });
+    document.getElementById('btn-theme-mobile').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      setTheme(isDark);
+    });
+    document.getElementById('btn-theme-settings').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      setTheme(isDark);
+    });
+
+    // ---------- User data handling ----------
+    const user = JSON.parse(localStorage.getItem('userData')) || { id: 'Tutor', rol: 'Tutor' };
+    // Fill UI
+    document.getElementById('sidebar-rol').textContent = user.rol || '';
+    document.getElementById('user-name-top').textContent = user.id || 'Tutor';
+    document.getElementById('user-role-top').textContent = user.rol || '';
+    document.getElementById('topbar-usuario').textContent = user.id || 'Tutor';
+    document.getElementById('topbar-rol').textContent = user.rol || '';
+    document.getElementById('m-name').textContent = user.id || 'Tutor';
+    document.getElementById('m-role').textContent = user.rol || '';
+    document.getElementById('profile-name').textContent = user.id || 'Tutor';
+    document.getElementById('profile-role').textContent = user.rol || 'Tutor';
+    document.getElementById('sidebar-rol').textContent = user.rol || '';
+
+    // optional: avatar initials
+    const avatar = document.getElementById('avatar');
+    const initials = (user.id || 'T').split(' ').map(s => s[0]).splice(0,2).join('').toUpperCase();
+    // create data url with initials (svg)
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' fill='${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='36' fill='${document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827'}' font-family='Arial'>${initials}</text></svg>`;
+    avatar.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+
+    // ---------- Quick form behavior (demo persistence to localStorage) ----------
+    const quickForm = document.getElementById('quick-form');
+    const studentsKey = 'tutor_students_demo';
+    const tutKey = 'tutor_tutorias_demo';
+    function saveStudent(student) {
+      const arr = JSON.parse(localStorage.getItem(studentsKey) || '[]');
+      arr.push(student);
+      localStorage.setItem(studentsKey, JSON.stringify(arr));
+      renderStudents();
+    }
+    function saveTutoria(t) {
+      const arr = JSON.parse(localStorage.getItem(tutKey) || '[]');
+      arr.push(t);
+      localStorage.setItem(tutKey, JSON.stringify(arr));
+      renderHistory();
+    }
+
+    quickForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const student = document.getElementById('tf-student').value.trim();
+      if (!student) return alert('Ingrese el nombre del estudiante');
+      const type = document.getElementById('tf-type').value;
+      const notes = document.getElementById('tf-notes').value;
+      const date = document.getElementById('tf-date').value || new Date().toISOString().slice(0,10);
+      // save student and tutoria (demo)
+      saveStudent({ name: student, code: '—', carrera: '—', last: date });
+      saveTutoria({ date, student, type, notes });
+      // update quick counts
+      document.getElementById('count-today').textContent = ++quickCounts.today;
+      document.getElementById('recent-actions').innerHTML = `<li class="text-sm">${new Date().toLocaleString()}: Registro rápido para <strong>${student}</strong></li>` + document.getElementById('recent-actions').innerHTML;
+      // clear form
+      quickForm.reset();
+      alert('Tutoría registrada (demo local).');
+    });
+
+    // Full form
+    document.getElementById('full-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const s = document.getElementById('full-student').value.trim();
+      if (!s) return alert('Ingrese nombre del estudiante');
+      const code = document.getElementById('full-code').value.trim();
+      const date = document.getElementById('full-date').value || new Date().toISOString();
+      const type = document.getElementById('full-type').value;
+      const notes = document.getElementById('full-notes').value;
+      saveStudent({ name: s, code: code || '—', carrera: '—', last: date });
+      saveTutoria({ date, student: s, type, notes });
+      alert('Tutoría guardada (demo local).');
+      document.getElementById('full-form').reset();
+    });
+    document.getElementById('btn-clear-full').addEventListener('click', () => document.getElementById('full-form').reset());
+
+    // render students and history
+    function renderStudents() {
+      const arr = JSON.parse(localStorage.getItem(studentsKey) || '[]');
+      const tbody = document.getElementById('students-tbody');
+      document.getElementById('total-students').textContent = arr.length;
+      if (!arr.length) {
+        tbody.innerHTML = '<tr><td class="p-3" colspan="6">No hay estudiantes cargados. Usa el formulario para agregar uno rápido.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = arr.map((s,i) => `
+        <tr class="border-t border-gray-100 dark:border-gray-700">
+          <td class="px-3 py-2">${i+1}</td>
+          <td class="px-3 py-2">${s.name}</td>
+          <td class="px-3 py-2">${s.code}</td>
+          <td class="px-3 py-2">${s.carrera}</td>
+          <td class="px-3 py-2">${new Date(s.last).toLocaleDateString()}</td>
+          <td class="px-3 py-2">
+            <button class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700" data-index="${i}" onclick="editStudent(event)">Editar</button>
+            <button class="text-xs px-2 py-1 rounded bg-red-50 dark:bg-red-700/30" data-index="${i}" onclick="removeStudent(event)">Eliminar</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.editStudent = function (e) {
+      const i = +e.target.getAttribute('data-index');
+      const arr = JSON.parse(localStorage.getItem(studentsKey) || '[]');
+      const s = arr[i];
+      if (!s) return;
+      // simple prompt edit demo
+      const newName = prompt('Editar nombre', s.name);
+      if (newName) {
+        s.name = newName;
+        arr[i] = s;
+        localStorage.setItem(studentsKey, JSON.stringify(arr));
+        renderStudents();
+      }
+    };
+
+    window.removeStudent = function (e) {
+      const i = +e.target.getAttribute('data-index');
+      const arr = JSON.parse(localStorage.getItem(studentsKey) || '[]');
+      if (!confirm('Eliminar estudiante?')) return;
+      arr.splice(i,1);
+      localStorage.setItem(studentsKey, JSON.stringify(arr));
+      renderStudents();
+    };
+
+    function renderHistory() {
+      const arr = JSON.parse(localStorage.getItem(tutKey) || '[]').slice().reverse();
+      const tbody = document.getElementById('history-tbody');
+      if (!arr.length) {
+        tbody.innerHTML = '<tr><td class="p-3" colspan="4">No hay registros aún.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = arr.map(h => `
+        <tr class="border-t border-gray-100 dark:border-gray-700">
+          <td class="px-3 py-2">${new Date(h.date).toLocaleString()}</td>
+          <td class="px-3 py-2">${h.student}</td>
+          <td class="px-3 py-2">${h.type}</td>
+          <td class="px-3 py-2">${h.notes ? h.notes.substring(0,120) : ''}</td>
+        </tr>
+      `).join('');
+    }
+
+    // initial demo counts
+    const quickCounts = { today: 0, month: 0, students: 0, pending: 0 };
+
+    function refreshCounts() {
+      const students = JSON.parse(localStorage.getItem(studentsKey) || '[]').length;
+      const tut = JSON.parse(localStorage.getItem(tutKey) || '[]').length;
+      quickCounts.students = students;
+      quickCounts.month = tut; // demo
+      quickCounts.pending = 0;
+      document.getElementById('count-month').textContent = quickCounts.month;
+      document.getElementById('count-students').textContent = quickCounts.students;
+      document.getElementById('count-pending').textContent = quickCounts.pending;
+      document.getElementById('count-today').textContent = quickCounts.today;
+    }
+
+    // history search demo
+    document.getElementById('hist-search').addEventListener('click', () => {
+      const q = document.getElementById('hist-filtro').value.toLowerCase();
+      const all = JSON.parse(localStorage.getItem(tutKey) || '[]').reverse();
+      const filtered = all.filter(x => (x.student || '').toLowerCase().includes(q) || (x.notes||'').toLowerCase().includes(q));
+      const tbody = document.getElementById('history-tbody');
+      if (!filtered.length) tbody.innerHTML = '<tr><td class="p-3" colspan="4">No hay coincidencias.</td></tr>';
+      else tbody.innerHTML = filtered.map(h => `<tr class="border-t border-gray-100 dark:border-gray-700"><td class="px-3 py-2">${new Date(h.date).toLocaleString()}</td><td class="px-3 py-2">${h.student}</td><td class="px-3 py-2">${h.type}</td><td class="px-3 py-2">${h.notes?.substring(0,120)||''}</td></tr>`).join('');
+    });
+
+    // export CSV (simple)
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const arr = JSON.parse(localStorage.getItem(studentsKey) || '[]');
+      if (!arr.length) return alert('No hay estudiantes para exportar.');
+      const csv = ['Nombre,Código,Carrera,Última tutoría', ...arr.map(s => `"${s.name}","${s.code}","${s.carrera}","${s.last}"`)].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'estudiantes.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // initial render
+    renderStudents();
+    renderHistory();
+    refreshCounts();
+
+    // keyboard shortcut: R for quick register focus
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'r' && !(e.ctrlKey||e.metaKey)) {
+        document.getElementById('tf-student').focus();
+      }
+    });
+
+    // Keep the PDF link path visible (developer note: uses uploaded file path)
+    document.getElementById('pdf-link').href = 'sandbox:/mnt/data/Proyecto semestral 2025-2.pdf';
+  </script>
 </body>
 </html>
