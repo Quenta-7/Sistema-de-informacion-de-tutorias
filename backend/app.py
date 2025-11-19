@@ -1,20 +1,39 @@
 # backend/app.py
 
-from flask import Flask
+from flask import Flask, send_from_directory
+from flask_cors import CORS
 from controllers.auth_controller import auth_bp
-from flask_cors import CORS # Importa CORS para permitir comunicación con el front-end
 
-app = Flask(__name__)
-# Habilita CORS para permitir peticiones desde el navegador (frontend)
-CORS(app) 
+app = Flask(__name__, static_folder="../frontend", static_url_path="")
+CORS(app)
 
-# Registrar el Blueprint de autenticación. Todas las rutas empezarán con /api/auth
-app.register_blueprint(auth_bp, url_prefix='/api/auth')
+# Registrar Blueprint
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
-@app.route('/')
+# --------------------------
+#  RUTAS PRINCIPALES
+# --------------------------
+
+@app.route("/")
 def home():
-    return "Servidor del Sistema de Tutorías en funcionamiento"
+    return send_from_directory(app.static_folder, "index.html")
 
-if __name__ == '__main__':
-    # Ejecuta el servidor en el puerto 5000 (diferente al puerto de Postgres)
-    app.run(debug=True, port=5000)
+@app.route("/admin")
+def admin_dashboard():
+    return send_from_directory(app.static_folder, "dashboard.html")
+
+@app.route("/tutor")
+def tutor_dashboard():
+    return send_from_directory(app.static_folder, "dashboard_tutor.html")
+
+@app.route("/estudiante")
+def estudiante_dashboard():
+    return send_from_directory(app.static_folder, "dashboard_estudiante.html")
+
+# Para servir JS, CSS, imágenes
+@app.route("/<path:filename>")
+def static_files(filename):
+    return send_from_directory(app.static_folder, filename)
+
+if __name__ == "__main__":
+    app.run(debug=True)

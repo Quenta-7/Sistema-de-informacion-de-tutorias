@@ -63,18 +63,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     let destino;
 
                     if (result.user.rol === 'administrador') {
-                        destino = `${window.location.origin}/frontend/dashboard.html`;
+                        destino = `${window.location.origin}/admin`;
                     } else if (result.user.rol === 'tutor') {
-                        destino = `${window.location.origin}/frontend/dashboard_tutor.html`;
+                        destino = `${window.location.origin}/tutor`;
                     } 
                     else if (result.user.rol === 'estudiante') {
-                        destino = `${window.location.origin}/frontend/dashboard_estudiante.html`;
+                        destino = `${window.location.origin}/estudiante`;
                     } 
                     else if (result.user.rol === 'verificador'){
-                        destino = `${window.location.origin}/fronted/dashboard_verificador.html`;
+                        destino = `${window.location.origin}/verificador`;
                     }
                     else {
-                        destino = `${window.location.origin}/frontend/home.html`;
+                        destino = `${window.location.origin}/`;
                     }
                     
                     console.log("Redirigiendo a:", destino);
