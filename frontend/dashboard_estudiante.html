@@ -6,36 +6,103 @@
   <title>Panel del Estudiante</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-purple-50 min-h-screen flex flex-col">
-  <header class="bg-purple-700 text-white py-4 shadow-md">
-    <h1 class="text-center text-2xl font-bold">Panel del Estudiante</h1>
-  </header>
 
-  <main class="flex-grow flex flex-col items-center justify-center space-y-4">
-    <h2 class="text-xl font-semibold text-gray-700">Bienvenido, <span id="nombre-usuario">Estudiante</span></h2>
-    <p class="text-gray-600">Rol: <span id="rol-usuario"></span></p>
+<body class="bg-gray-100">
 
-    <div class="bg-white p-6 rounded-lg shadow-md w-80 text-center">
-      <h3 class="text-lg font-semibold mb-2">Funciones del Estudiante</h3>
-      <ul class="text-gray-600 list-disc text-left pl-6">
-        <li>Ver tutor asignado</li>
-        <li>Consultar horario de tutorías</li>
-        <li>Enviar retroalimentación</li>
-      </ul>
-    </div>
+  <!-- ==== LAYOUT GENERAL ==== -->
+  <div class="flex min-h-screen">
 
-    <button id="logout" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-      Cerrar Sesión
-    </button>
-  </main>
+    <!-- ========================================================= -->
+    <!-- =================== SIDEBAR IZQUIERDO =================== -->
+    <!-- ========================================================= -->
+    <aside class="w-64 bg-white shadow-md p-4 space-y-4">
+      <div class="flex items-center space-x-2">
+        <div class="bg-purple-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold">
+          E
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Panel del Estudiante</p>
+          <p class="text-gray-800 font-semibold" id="sidebar-username">Estudiante</p>
+        </div>
+      </div>
 
+      <nav class="pt-4 space-y-2">
+        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Dashboard</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Mi Tutor</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Horario</a>
+        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Retroalimentación</a>
+
+        <hr class="my-4">
+
+        <button id="logout" class="w-full text-left px-3 py-2 rounded bg-red-500 text-white hover:bg-red-600">
+          Cerrar sesión
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ========================================================= -->
+    <!-- =================== CONTENIDO PRINCIPAL ================= -->
+    <!-- ========================================================= -->
+    <main class="flex-1 p-8">
+
+      <h1 class="text-3xl font-bold text-gray-700">Dashboard</h1>
+      <p class="text-gray-500 mt-1">Resumen rápido</p>
+
+      <!-- === TARJETAS PRINCIPALES === -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-500">Tutor Asignado</p>
+          <p id="tutor-asignado" class="text-3xl font-bold mt-2">—</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-500">Próxima Tutoría</p>
+          <p id="proxima-tutoria" class="text-3xl font-bold mt-2">—</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <p class="text-gray-500">Retroalimentaciones enviadas</p>
+          <p id="cantidad-feedback" class="text-3xl font-bold mt-2">0</p>
+        </div>
+
+      </div>
+
+      <!-- === BLOQUE DETALLADO === -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
+
+        <!-- ---- SECCIÓN TUTOR ASIGNADO ---- -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold text-gray-700 mb-3">Información del Tutor</h2>
+          <p id="info-tutor" class="text-gray-600">
+            No tienes tutor asignado actualmente.
+          </p>
+        </div>
+
+        <!-- ---- SECCIÓN HORARIO ---- -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold text-gray-700 mb-3">Horario de Tutorías</h2>
+          <p id="info-horario" class="text-gray-600">
+            No hay horarios registrados.
+          </p>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- ======================== SCRIPT ========================= -->
+  <!-- ========================================================= -->
   <script>
     const user = JSON.parse(localStorage.getItem('userData'));
+
     if (!user) {
       window.location.href = '/';
     } else {
-      document.getElementById('nombre-usuario').textContent = user.id;
-      document.getElementById('rol-usuario').textContent = user.rol;
+      document.getElementById('sidebar-username').textContent = user.id;
     }
 
     document.getElementById('logout').addEventListener('click', () => {
@@ -43,5 +110,6 @@
       window.location.href = '/';
     });
   </script>
+
 </body>
 </html>
