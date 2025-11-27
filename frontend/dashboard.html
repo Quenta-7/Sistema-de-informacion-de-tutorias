@@ -404,6 +404,8 @@
     document.getElementById('btn-theme-mobile').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
     document.getElementById('btn-theme-settings').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
 
+
+     // ---------- User data and avatar ----------
     // ---------- User data and avatar ----------
     const user = JSON.parse(localStorage.getItem('userData')) || { id: 'Admin', rol: 'administrador' };
     document.getElementById('sidebar-rol').textContent = user.rol || '';
