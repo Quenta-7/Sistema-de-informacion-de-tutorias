@@ -64,7 +64,8 @@ Los roles incluyen: *Product Owner*, *Scrum Master*, *Development Team*, *Qualit
 **Equipo de Desarrollo:**  
 - José Francisco Quentasi Juachin  
 - Hernan Washintong Ramos Alata  
-
+- Jhon Kevin Halanocca Surco
+- Richard Braulio Puma Condori
 **Docente:**  
 - Ing. Carlos Ramon Quispe Onofre 
 
