@@ -1,8 +1,6 @@
 // ============================
-// FRONTEND - Login Script
+// FRONTEND - Login Script (sin redirección)
 // ============================
-// Este script maneja el envío del formulario de login
-// y la comunicación con el backend Flask.
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -12,11 +10,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const messageElement = document.getElementById('message');
     const loginButton = document.getElementById('login-button');
 
-    // Evento de envío del formulario
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Evita recargar la página
+    // Detecta la URL base de Flask según dónde se abra el front-end
+    const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                     ? 'http://127.0.0.1:5000'
+                     : 'http://34.60.247.196:5000';  // Reemplaza con tu IP pública de VM
 
-        // Limpiar mensajes y estilos previos
+    form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        // Limpiar mensajes previos
         messageElement.textContent = '';
         messageElement.className = 'text-center text-sm font-semibold h-4';
         tutorIdInput.classList.remove('input-error');
@@ -33,13 +35,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Deshabilita botón mientras se verifica
         loginButton.disabled = true;
         loginButton.textContent = 'Verificando...';
 
         try {
-            // Petición POST al backend Flask
-            const response = await fetch('http://localhost:5000/api/auth/login', {
+            const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tutor_id, password })
@@ -48,41 +48,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
 
             if (response.ok) {
-                // ✅ Login exitoso
                 messageElement.classList.add('text-green-600');
                 messageElement.textContent = `¡Bienvenido! Rol: ${result.user.rol}`;
                 loginButton.textContent = 'Éxito ✅';
 
-                // ✅ Guarda los datos del usuario localmente
+                // Guardar datos del usuario localmente (opcional)
                 localStorage.setItem('userData', JSON.stringify(result.user));
-
-                // 🕒 Redirección al dashboard según rol
-                setTimeout(() => {
-                    console.log("Intentando redirigir...");
-
-                    let destino;
-
-                    if (result.user.rol === 'administrador') {
-                        destino = `${window.location.origin}/admin`;
-                    } else if (result.user.rol === 'tutor') {
-                        destino = `${window.location.origin}/tutor`;
-                    } 
-                    else if (result.user.rol === 'estudiante') {
-                        destino = `${window.location.origin}/estudiante`;
-                    } 
-                    else if (result.user.rol === 'verificador'){
-                        destino = `${window.location.origin}/verificador`;
-                    }
-                    else {
-                        destino = `${window.location.origin}/`;
-                    }
-                    
-                    console.log("Redirigiendo a:", destino);
-                    window.location.href = destino;
-                }, 1500); // 1.5 segundos para mostrar el mensaje de éxito
-
             } else {
-                // ❌ Error en autenticación
                 messageElement.classList.add('text-red-600');
                 messageElement.textContent = result.message || 'Usuario o contraseña incorrectos.';
                 tutorIdInput.classList.add('input-error');
