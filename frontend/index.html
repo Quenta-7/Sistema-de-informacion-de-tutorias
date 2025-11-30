@@ -1,149 +1,95 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema de Tutorías UNSAAC</title>
-    <!-- Carga de Tailwind CSS para estilos modernos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Aplicamos la fuente Inter y centramos el contenido */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Un fondo gris claro agradable */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        /* Estilos específicos para la tarjeta de login */
-        #login-container {
-            max-width: 400px;
-            width: 90%;
-            transition: all 0.3s ease;
-        }
-        /* Estilo para el input de error (usado por JS) */
-        .input-error {
-            border-color: #ef4444; /* Rojo de Tailwind 500 */
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Tutorías UNSAAC – Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background-image: url("/img/INGSISTEMAS.jpeg"); /* 🔧 tu imagen local */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  </style>
 </head>
-<body class="p-4">
-    <div id="login-container" class="bg-white p-8 md:p-10 rounded-xl shadow-2xl space-y-6">
-        
-        <!-- Encabezado de la Aplicación -->
-        <header class="text-center space-y-2">
-            <!-- Icono de la UNSAAC o de Tutoría -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-blue-700 mx-auto" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 7l10 5 10-5-10-5zm0 13l-10-5v6l10 5 10-5v-6l-10 5zm0-3l-7-3.5 7-3.5 7 3.5-7 3.5z"/>
-            </svg>
-            <h1 class="text-2xl font-bold text-gray-800">Sistema de Tutorías</h1>
-            <p class="text-sm text-gray-500">Ingeniería Informática y de Sistemas - UNSAAC</p>
-        </header>
 
-        <!-- Formulario de Login -->
-        <form id="login-form" class="space-y-4">
-            
-            <div>
-                <label for="tutor_id" class="block text-sm font-medium text-gray-700 mb-1">ID de Usuario(DNI)</label>
-                <input 
-                    type="text" 
-                    id="tutor_id" 
-                    name="tutor_id" 
-                    required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150"
-                    placeholder="Escriba su DNI"
-                >
-            </div>
+<body class="min-h-screen flex items-center justify-center px-4 backdrop-blur-sm">
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
-                    required 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150"
-                    placeholder="••••••••"
-                >
-            </div>
-            
-            <!-- Mensaje de estado (éxito/error) -->
-            <p id="message" class="text-center text-sm font-semibold h-4"></p>
+  <!-- CARD -->
+  <div class="w-full max-w-md bg-slate-900/70 backdrop-blur-xl border border-slate-700/40 
+              rounded-3xl shadow-2xl p-8 text-white">
 
-            <button 
-                type="submit" 
-                id="login-button"
-                class="w-full py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-200 disabled:opacity-50"
-            >
-                Iniciar Sesión
-            </button>
-        </form>
-        
-        <footer class="text-center pt-4">
-            <p class="text-xs text-gray-400">Desarrollo Semestral IF611B</p>
-        </footer>
+    <!-- LOGO -->
+    <div class="flex justify-center mb-4">
+      <img src="/img/logo_info.jpg"
+           class="w-20 h-20 object-contain drop-shadow-lg" />
     </div>
 
-    <script>
-        // Lógica de JavaScript para manejar el login y la comunicación con Flask
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Previene el envío tradicional del formulario
+    <!-- TÍTULO -->
+    <h1 class="text-center text-2xl font-bold text-white">Sistema de Tutorías UNSAAC</h1>
 
-            const tutorIdInput = document.getElementById('tutor_id');
-            const passwordInput = document.getElementById('password');
-            const messageElement = document.getElementById('message');
-            const loginButton = document.getElementById('login-button');
+    <form id="login-form" class="mt-6 space-y-6">
 
-            // Limpiar mensajes y estilos anteriores
-            messageElement.textContent = ''; 
-            messageElement.className = 'text-center text-sm font-semibold h-4';
-            tutorIdInput.classList.remove('input-error');
-            passwordInput.classList.remove('input-error');
+      <!-- CORREO -->
+      <div>
+        <label class="text-sm text-gray-300">Correo institucional</label>
+        <input
+          id="email"
+          type="email"
+          placeholder="usuario@unsaac.edu.pe"
+          class="w-full mt-1 p-3 bg-transparent border-b border-gray-400 text-white 
+                 placeholder-gray-400 focus:outline-none focus:border-sky-400"
+        />
+      </div>
 
-            loginButton.disabled = true;
-            loginButton.textContent = 'Verificando...';
-            
-            const tutor_id = tutorIdInput.value;
-            const password = passwordInput.value;
+      <!-- PASSWORD -->
+      <div>
+        <label class="text-sm text-gray-300">Password</label>
+        <input
+          id="password"
+          type="password"
+          placeholder="Ingrese su contraseña"
+          class="w-full mt-1 p-3 bg-transparent border-b border-gray-400 text-white 
+                 placeholder-gray-400 focus:outline-none focus:border-sky-400"
+        />
+      </div>
 
-            try {
-                // ** IMPORTANTE: Asegúrate de que tu servidor Flask esté corriendo en el puerto 5000 **
-                const response = await fetch('http://localhost:5000/api/auth/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ tutor_id, password })
-                });
+      <!-- MENSAJE ERROR -->
+      <p id="message" class="text-red-400 text-sm h-4"></p>
 
-                const result = await response.json();
+      <!-- BOTÓN LOGIN -->
+      <button
+        id="login-button"
+        type="submit"
+        class="w-full py-3 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 
+               hover:from-sky-400 hover:to-blue-500 font-semibold shadow-lg mt-2"
+      >
+        Login
+      </button>
 
-                if (response.ok) {
-                    messageElement.classList.add('text-green-600');
-                    messageElement.textContent = `¡Bienvenido! Rol: ${result.user.rol}`;
-                    loginButton.textContent = 'Éxito';
-                    // *** AQUÍ DEBES REDIRECCIONAR AL DASHBOARD ***
-                    // window.location.href = 'dashboard.html'; 
-                } else {
-                    messageElement.classList.add('text-red-600');
-                    messageElement.textContent = result.message || 'Error en la autenticación.';
-                    tutorIdInput.classList.add('input-error');
-                    passwordInput.classList.add('input-error');
-                    loginButton.textContent = 'Iniciar Sesión';
-                }
-            } catch (error) {
-                console.error('Error de conexión con el servidor:', error);
-                messageElement.classList.add('text-red-600');
-                messageElement.textContent = 'Error: No se pudo conectar al servidor Flask (Puerto 5000).';
-                loginButton.textContent = 'Iniciar Sesión';
-            } finally {
-                loginButton.disabled = false;
-            }
-        });
-    </script>
-    <!-- 🔗 Enlazamos el archivo JS externo -->
+      <!-- DIVISOR -->
+      <div class="flex items-center gap-4 text-gray-400 text-xs my-4">
+        <span class="flex-1 h-px bg-gray-600"></span>
+        <span>o</span>
+        <span class="flex-1 h-px bg-gray-600"></span>
+      </div>
+
+      <!-- WHATSAPP: CREAR CUENTA -->
+      <div class="text-center">
+        <a href="https://wa.me/+51910405266?text=Quiero%20crear%20una%20cuenta"
+           target="_blank"
+           class="flex items-center justify-center gap-2 text-green-400 hover:text-green-300 transition">
+           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" class="w-5 h-5">
+          Crear cuenta
+        </a>
+      </div>
+
+    </form>
+  </div>
+
   <script src="main.js"></script>
 </body>
 </html>
