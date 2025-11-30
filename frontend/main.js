@@ -1,74 +1,100 @@
-// ============================
-// FRONTEND - Login Script (sin redirección)
-// ============================
+document.addEventListener("DOMContentLoaded", () => {
 
-document.addEventListener('DOMContentLoaded', function () {
+    console.log("Login JS cargado correctamente.");
 
-    const form = document.getElementById('login-form');
-    const tutorIdInput = document.getElementById('tutor_id');
-    const passwordInput = document.getElementById('password');
-    const messageElement = document.getElementById('message');
-    const loginButton = document.getElementById('login-button');
+    const form = document.getElementById("login-form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const messageElement = document.getElementById("message");
+    const loginButton = document.getElementById("login-button");
 
-    // Detecta la URL base de Flask según dónde se abra el front-end
-    const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-                     ? 'http://127.0.0.1:5000'
-                     : 'http://34.60.247.196:5000';  // Reemplaza con tu IP pública de VM
+    if (!form) {
+        console.error("ERROR: No existe el formulario con id='login-form'");
+        return;
+    }
 
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault();
+    // Detectar si es local o producción
+    const BASE_URL =
+        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+            ? "http://127.0.0.1:8080"
+            : "http://34.60.247.196:8080";
 
-        // Limpiar mensajes previos
-        messageElement.textContent = '';
-        messageElement.className = 'text-center text-sm font-semibold h-4';
-        tutorIdInput.classList.remove('input-error');
-        passwordInput.classList.remove('input-error');
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-        const tutor_id = tutorIdInput.value.trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
-        if (!tutor_id || !password) {
-            messageElement.classList.add('text-red-600');
-            messageElement.textContent = 'Por favor, complete todos los campos.';
-            tutorIdInput.classList.add('input-error');
-            passwordInput.classList.add('input-error');
+        if (!email || !password) {
+            messageElement.textContent = "Complete todos los campos.";
             return;
         }
 
         loginButton.disabled = true;
-        loginButton.textContent = 'Verificando...';
+        loginButton.textContent = "Verificando...";
 
         try {
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tutor_id, password })
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
             });
 
             const result = await response.json();
+            console.log("Respuesta backend:", result);
 
-            if (response.ok) {
-                messageElement.classList.add('text-green-600');
-                messageElement.textContent = `¡Bienvenido! Rol: ${result.user.rol}`;
-                loginButton.textContent = 'Éxito ✅';
+            if (!response.ok) {
+                messageElement.textContent = result.message || "Usuario o contraseña incorrectos.";
+                loginButton.disabled = false;
+                loginButton.textContent = "Iniciar Sesión";
+                return;
+            }
 
-                // Guardar datos del usuario localmente (opcional)
-                localStorage.setItem('userData', JSON.stringify(result.user));
-            } else {
-                messageElement.classList.add('text-red-600');
-                messageElement.textContent = result.message || 'Usuario o contraseña incorrectos.';
-                tutorIdInput.classList.add('input-error');
-                passwordInput.classList.add('input-error');
-                loginButton.textContent = 'Iniciar Sesión';
+            // ================================
+            //  NORMALIZAR OBJETO USUARIO
+            // ================================
+            const rol = Number(result.user.rol || result.user.id_rol);
+
+            const userData = {
+                id: result.user.id || result.user.id_usuario,
+                nombre: result.user.nombre,
+                apellido: result.user.apellido,
+                email: result.user.email,
+                rol: rol,
+            };
+
+            console.log("Usuario normalizado:", userData);
+
+            // Guardar usuario normalizado
+            localStorage.setItem("userData", JSON.stringify(userData));
+
+            // ================================
+            //  REDIRECCIÓN SEGÚN ROL
+            // ================================
+            switch (rol) {
+                case 1:
+                    window.location.href = "/admin";
+                    break;
+                case 2:
+                    window.location.href = "/tutor";
+                    break;
+                case 3:
+                    window.location.href = "/estudiante";
+                    break;
+                case 4:
+                    window.location.href = "/verificador";
+                    break;
+                default:
+                    console.warn("ROL NO RECONOCIDO:", rol);
+                    window.location.href = "/";
             }
 
         } catch (error) {
-            console.error('Error de conexión con el servidor:', error);
-            messageElement.classList.add('text-red-600');
-            messageElement.textContent = 'No se pudo conectar al servidor Flask (Puerto 5000).';
-            loginButton.textContent = 'Iniciar Sesión';
-        } finally {
-            loginButton.disabled = false;
+            console.error("Error de conexión:", error);
+            messageElement.textContent = "No se pudo conectar al servidor.";
         }
+
+        loginButton.disabled = false;
+        loginButton.textContent = "Iniciar Sesión";
     });
 });

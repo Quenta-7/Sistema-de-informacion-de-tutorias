@@ -1,544 +1,350 @@
 <!DOCTYPE html>
-<html lang="es" class="antialiased">
+<html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Panel Administrador — Sistema de Tutorías</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador – Sistema de Tutorías UNSAAC</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    .theme-transition { transition: background-color .25s, color .25s; }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
+    body {
+      background: radial-gradient(circle at 10% 10%, #0ea5e9 0%, #020617 70%);
+    }
+
+    /* MODAL BASE */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 theme-transition">
 
-  <div id="app" class="min-h-screen flex">
+<body class="min-h-screen p-6 text-white">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 hidden md:block">
-      <div class="flex items-center gap-3 px-2 mb-6">
-        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-lg">A</div>
-        <div>
-          <h1 class="text-lg font-bold">Admin — Tutorías</h1>
-          <p id="sidebar-rol" class="text-sm text-gray-500 dark:text-gray-300"></p>
+  <!-- CONTENEDOR GENERAL -->
+  <div class="w-full max-w-7xl mx-auto flex rounded-3xl border border-sky-500/30 bg-slate-950/60 
+              backdrop-blur-xl shadow-[0_0_40px_rgba(56,189,248,0.35)] overflow-hidden">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="w-72 border-r border-sky-400/20 p-6 flex flex-col justify-between bg-slate-950/60">
+
+      <!-- Perfil -->
+      <div>
+        <div class="flex items-center space-x-3 mb-6">
+          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 
+                      flex items-center justify-center text-xl font-bold text-slate-900">
+            A
+          </div>
+
+          <div>
+            <p class="text-xs uppercase tracking-widest text-yellow-400/80">Administrador</p>
+            <p id="admin-nombre" class="text-sm font-semibold text-slate-100">—</p>
+          </div>
         </div>
+
+        <!-- MENÚ -->
+        <nav class="space-y-2 text-sm">
+
+          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl bg-sky-500/20 
+                         text-sky-300 border border-sky-400/40"
+                  data-target="sec-dashboard">
+            📊 Panel General
+          </button>
+
+          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl hover:bg-slate-800/80
+                          text-slate-200 border border-transparent"
+                  data-target="sec-usuarios">
+            🛂 Gestión de Usuarios
+          </button>
+
+          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl hover:bg-slate-800/80
+                          text-slate-200 border border-transparent"
+                  data-target="sec-asignaciones">
+            🔄 Asignar Tutores
+          </button>
+
+        </nav>
       </div>
 
-      <nav class="space-y-1 text-sm">
-        <a href="#/admin" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9.75L12 4l9 5.75V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.75z"/></svg>
-          <span>Dashboard</span>
-        </a>
-
-        <a href="#/tutorias" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Gestión de Tutorías</span>
-        </a>
-
-        <a href="#/reportes" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18M7 14l3 3 7-7" /></svg>
-          <span>Reportes</span>
-        </a>
-
-        <a href="#/usuarios" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11c1.657 0 3-1.567 3-3.5S17.657 4 16 4s-3 1.567-3 3.5S14.343 11 16 11zM8 11c1.657 0 3-1.567 3-3.5S9.657 4 8 4 5 5.567 5 7.5 6.343 11 8 11zM2 20a6 6 0 0 1 12 0"/></svg>
-          <span>Usuarios</span>
-        </a>
-
-        <a href="#/cronograma" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 0 0 2-2V8H3v11a2 2 0 0 0 2 2z"/></svg>
-          <span>Cronograma</span>
-        </a>
-
-        <a id="pdf-link" target="_blank" href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v6h6M7 21h10a2 2 0 0 0 2-2V7l-5-5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2z"/></svg>
-          <span>Documentación (PDF)</span>
-        </a>
-
-        <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
-
-        <a href="#/configuracion" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
-          <span>Configuración</span>
-        </a>
-
-        <button id="logout-desktop" class="w-full text-left mt-4 p-2 text-sm rounded hover:bg-red-50 dark:hover:bg-red-700 flex items-center gap-3 text-red-600 dark:text-red-400">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8v8"/></svg>
-          Cerrar sesión
-        </button>
-      </nav>
-
-      <div class="mt-6 text-xs text-gray-500 dark:text-gray-400">
-        Atajo: <span class="font-medium">R</span> — registrar tutoría
-      </div>
+      <button id="logout-btn"
+              class="w-full px-3 py-2 mt-6 rounded-xl bg-rose-600/90 hover:bg-rose-500 
+                     text-sm font-semibold transition">
+        Cerrar sesión
+      </button>
     </aside>
 
-    <!-- MOBILE TOPBAR & CONTENT -->
-    <div class="flex-1 flex flex-col">
-      <!-- Mobile topbar -->
-      <header class="flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 md:hidden">
-        <button id="btn-open-sidebar" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
+    <!-- ===================== CONTENIDO ===================== -->
+    <main class="flex-1 p-10 space-y-10">
 
-        <div class="flex items-center gap-3">
-          <button id="btn-theme-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
-            <svg id="icon-theme-mobile" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
-          </button>
-
-          <div class="text-sm text-gray-700 dark:text-gray-200">
-            <div id="topbar-usuario" class="font-semibold">Administrador</div>
-            <div id="topbar-rol" class="text-xs text-gray-500 dark:text-gray-400"></div>
-          </div>
-        </div>
+      <!-- Encabezado -->
+      <header>
+        <h1 class="text-3xl font-semibold text-slate-50">Panel del Administrador</h1>
+        <p class="text-slate-400 text-sm">Control general del sistema de tutorías UNSAAC.</p>
       </header>
 
-      <!-- Desktop topbar -->
-      <div class="hidden md:flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex items-center gap-4">
-          <h2 id="page-title" class="text-2xl font-bold">Dashboard</h2>
-          <span id="page-sub" class="text-sm text-gray-500 dark:text-gray-300">Resumen</span>
-        </div>
+      <!-- ===================== SECCIONES ===================== -->
 
-        <div class="flex items-center gap-3">
-          <button id="btn-theme" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
-            <svg id="icon-theme" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
+      <!-- ----------- PANEL GENERAL ----------- -->
+      <section id="sec-dashboard" class="section">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <div class="rounded-2xl border border-sky-400/20 bg-slate-900/70 p-4">
+            <p class="text-[10px] uppercase tracking-widest text-sky-300">Estudiantes</p>
+            <p id="card-estudiantes" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          </div>
+
+          <div class="rounded-2xl border border-emerald-400/20 bg-slate-900/70 p-4">
+            <p class="text-[10px] uppercase tracking-widest text-emerald-300">Tutores</p>
+            <p id="card-tutores" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          </div>
+
+          <div class="rounded-2xl border border-amber-400/20 bg-slate-900/70 p-4">
+            <p class="text-[10px] uppercase tracking-widest text-amber-300">Cronogramas</p>
+            <p id="card-cronos" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          </div>
+
+          <div class="rounded-2xl border border-fuchsia-400/20 bg-slate-900/70 p-4">
+            <p class="text-[10px] uppercase tracking-widest text-fuchsia-300">Tutorías</p>
+            <p id="card-tutorias" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ----------- USUARIOS ----------- -->
+      <section id="sec-usuarios" class="section hidden">
+
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-slate-100">Gestión de Usuarios</h2>
+
+          <button id="btn-nuevo-usuario"
+                  class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold">
+            ➕ Crear Usuario
           </button>
-
-          <div class="flex items-center gap-3">
-            <div class="text-right">
-              <div id="user-name-top" class="font-semibold">Administrador</div>
-              <div id="user-role-top" class="text-xs text-gray-500 dark:text-gray-400"></div>
-            </div>
-            <div>
-              <img id="avatar" src="" alt="avatar" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
-            </div>
-          </div>
         </div>
-      </div>
 
-      <!-- MAIN content -->
-      <main class="p-6">
-        <!-- DASHBOARD view -->
-        <section id="panel-admin" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías hoy</p>
-              <p id="count-today" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías este mes</p>
-              <p id="count-month" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Usuarios</p>
-              <p id="count-users" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorados asignados</p>
-              <p id="count-students" class="text-2xl font-bold">0</p>
-            </div>
-          </div>
-
-          <!-- Quick create tutoria + recent -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <h3 class="text-lg font-semibold mb-3">Registrar Tutoría (rápida)</h3>
-              <form id="quick-form" class="space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input id="tf-student" type="text" placeholder="Nombre del estudiante" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" required />
-                  <select id="tf-type" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
-                    <option value="academica">Académica</option>
-                    <option value="personal">Personal</option>
-                    <option value="profesional">Profesional</option>
-                  </select>
-                </div>
-                <textarea id="tf-notes" rows="3" placeholder="Observaciones / notas" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent"></textarea>
-
-                <div class="flex items-center gap-3">
-                  <input id="tf-date" type="date" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-                  <button type="submit" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Registrar</button>
-                </div>
-              </form>
-            </div>
-
-            <aside class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-              <h4 class="font-semibold mb-3">Acciones recientes</h4>
-              <ul id="recent-actions" class="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-                <li>No hay acciones recientes</li>
-              </ul>
-            </aside>
-          </div>
-
-          <!-- Tabla Usuarios (admin) -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold">Usuarios</h3>
-              <div class="flex items-center gap-2">
-                <button id="btn-add-user" class="bg-blue-600 text-white px-3 py-1 rounded">Nuevo Usuario</button>
-                <button id="btn-export-users" class="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">Exportar CSV</button>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
-                  <tr>
-                    <th class="px-3 py-2">#</th>
-                    <th class="px-3 py-2">Nombre</th>
-                    <th class="px-3 py-2">Correo</th>
-                    <th class="px-3 py-2">Rol</th>
-                    <th class="px-3 py-2">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="users-tbody" class="text-gray-700 dark:text-gray-200">
-                  <tr><td class="p-3" colspan="5">No hay usuarios. Crea uno con "Nuevo Usuario".</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </section>
-
-        <!-- GESTIÓN DE TUTORÍAS -->
-        <section id="panel-tutorias" class="hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Gestión de Tutorías</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-300">Lista de tutorías (demo local).</p>
-
-            <div class="overflow-x-auto mt-4">
-              <table class="w-full text-sm">
-                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
-                  <tr>
-                    <th class="px-3 py-2">Fecha</th>
-                    <th class="px-3 py-2">Estudiante</th>
-                    <th class="px-3 py-2">Tipo</th>
-                    <th class="px-3 py-2">Tutor</th>
-                    <th class="px-3 py-2">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="tutorias-tbody" class="text-gray-700 dark:text-gray-200">
-                  <tr><td class="p-3" colspan="5">No hay tutorías registradas.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- REPORTES -->
-        <section id="panel-reportes" class="hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Reportes</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-300">Estadísticas y reportes (mock/demo).</p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div class="p-4 bg-white dark:bg-gray-900 rounded border border-gray-100 dark:border-gray-700">
-                <p class="text-xs text-gray-500">Tutorías por tipo (último mes)</p>
-                <p class="text-2xl font-bold mt-2">—</p>
-              </div>
-              <div class="p-4 bg-white dark:bg-gray-900 rounded border border-gray-100 dark:border-gray-700">
-                <p class="text-xs text-gray-500">Tutorías por tutor</p>
-                <p class="text-2xl font-bold mt-2">—</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- USUARIOS -->
-        <section id="panel-usuarios" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Administrar Usuarios</h3>
-            <form id="user-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input id="u-name" placeholder="Nombre completo" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-              <input id="u-email" placeholder="Correo electrónico" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-              <select id="u-role" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
-                <option value="administrador">administrador</option>
-                <option value="tutor">tutor</option>
-                <option value="verificador">verificador</option>
-              </select>
-              <div class="flex items-center gap-2">
-                <button id="btn-save-user" type="button" class="bg-green-600 text-white px-4 py-2 rounded">Guardar</button>
-                <button id="btn-clear-user" type="button" class="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded">Limpiar</button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- CRONOGRAMA -->
-        <section id="panel-cronograma" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Cronograma</h3>
-            <div class="p-6 border rounded border-dashed border-gray-200 dark:border-gray-700 text-center text-sm">
-              Calendario / Cronograma (vista demo — integrar backend)
-            </div>
-          </div>
-        </section>
-
-        <!-- CONFIGURACIÓN -->
-        <section id="panel-configuracion" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-3">Configuración</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Tema</p>
-                <div class="flex items-center gap-3">
-                  <button id="btn-theme-settings" class="px-3 py-2 rounded border">Alternar tema</button>
-                  <span id="theme-status" class="text-sm text-gray-600 dark:text-gray-300"></span>
-                </div>
-              </div>
-              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Información</p>
-                <div class="text-sm">
-                  <p><strong id="profile-name">Administrador</strong></p>
-                  <p id="profile-role" class="text-gray-500 dark:text-gray-300">Rol</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- MOBILE SIDEBAR OVERLAY -->
-  <div id="mobile-sidebar" class="fixed inset-0 z-40 bg-black/40 hidden">
-    <div class="w-72 bg-white dark:bg-gray-800 h-full p-4">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded bg-blue-600 flex items-center justify-center text-white">A</div>
-          <div>
-            <div id="m-name" class="font-semibold">Administrador</div>
-            <div id="m-role" class="text-xs text-gray-500 dark:text-gray-300">Rol</div>
-          </div>
+        <div id="lista-usuarios" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+          Cargando...
         </div>
-        <button id="btn-close-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </section>
+
+
+      <!-- ----------- ASIGNACIONES ----------- -->
+      <section id="sec-asignaciones" class="section hidden">
+
+        <h2 class="text-xl font-semibold text-slate-100 mb-4">Asignación de Tutorados</h2>
+
+        <button id="btn-asignar"
+                class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold">
+          ➕ Nueva Asignación
         </button>
+
+        <div id="resultado-asignacion" class="mt-4 text-slate-300"></div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ================= MODAL CREAR USUARIO ================= -->
+  <div id="modal-user" class="modal">
+    <div class="bg-slate-900 rounded-xl p-6 w-96 border border-sky-500/30">
+
+      <h2 class="text-xl font-semibold mb-4">Crear Usuario</h2>
+
+      <input id="u-nombre" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Nombre">
+      <input id="u-apellido" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Apellido">
+      <input id="u-email" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Email">
+      <input id="u-pass" type="password" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4" placeholder="Contraseña">
+
+      <label class="text-sm text-slate-300">Rol</label>
+      <select id="u-rol" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4">
+        <option value="1">Administrador</option>
+        <option value="2">Tutor</option>
+        <option value="3">Alumno</option>
+        <option value="4">Verificador</option>
+      </select>
+
+      <div class="flex justify-end gap-2">
+        <button class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600">Cancelar</button>
+        <button id="crear-usuario" class="px-3 py-2 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold">Crear</button>
       </div>
 
-      <nav class="flex flex-col gap-2">
-        <a href="#/admin" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-        <a href="#/tutorias" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Gestión de Tutorías</a>
-        <a href="#/reportes" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Reportes</a>
-        <a href="#/usuarios" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Usuarios</a>
-        <a href="#/cronograma" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Cronograma</a>
-        <a href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf" target="_blank" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Documentación</a>
-      </nav>
     </div>
   </div>
 
-  <!-- SCRIPTS -->
+  <!-- ================= MODAL ASIGNACIÓN ================= -->
+  <div id="modal-asignar" class="modal">
+    <div class="bg-slate-900 rounded-xl p-6 w-96 border border-sky-500/30">
+
+      <h2 class="text-xl font-semibold mb-4">Asignar Tutor a Alumno</h2>
+
+      <label>Alumno</label>
+      <select id="sel-alumnos" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4"></select>
+
+      <label>Tutor</label>
+      <select id="sel-tutores" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4"></select>
+
+      <div class="flex justify-end gap-2">
+        <button class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600">Cancelar</button>
+        <button id="asignar-btn" class="px-3 py-2 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold">Asignar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SCRIPTS ================= -->
   <script>
-    // ---------- Routes mapping ----------
-    const sections = {
-      '/admin': document.getElementById('panel-admin'),
-      '/tutorias': document.getElementById('panel-tutorias'),
-      '/reportes': document.getElementById('panel-reportes'),
-      '/usuarios': document.getElementById('panel-usuarios'),
-      '/cronograma': document.getElementById('panel-cronograma'),
-      '/configuracion': document.getElementById('panel-configuracion')
+    /* ---------------- VALIDACIÓN LOGIN ---------------- */
+    const admin = JSON.parse(localStorage.getItem("userData"));
+    if (!admin || admin.rol !== 1) window.location.href = "/";
+
+    document.getElementById("admin-nombre").textContent =
+      admin.nombre + " " + (admin.apellido || "");
+
+    document.getElementById("logout-btn").onclick = () => {
+      localStorage.removeItem("userData");
+      window.location.href = "/";
     };
 
-    function showRoute(route) {
-      const r = route || '/admin';
-      Object.values(sections).forEach(s => s && s.classList.add('hidden'));
-      if (sections[r]) sections[r].classList.remove('hidden');
+    /* ---------------- TAB NAVIGATION ---------------- */
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const sections = document.querySelectorAll(".section");
 
-      const titleMap = {
-        '/admin': ['Dashboard','Resumen'],
-        '/tutorias': ['Gestión de Tutorías','Ver y administrar tutorías'],
-        '/reportes': ['Reportes','Estadísticas'],
-        '/usuarios': ['Usuarios','Administración de usuarios'],
-        '/cronograma': ['Cronograma','Fechas programadas'],
-        '/configuracion': ['Configuración','Preferencias']
-      };
-      const t = titleMap[r] || ['Panel',''];
-      document.getElementById('page-title').textContent = t[0];
-      document.getElementById('page-sub').textContent = t[1];
+    tabBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.target;
 
-      document.querySelectorAll('.nav-link').forEach(a => {
-        a.classList.remove('bg-gray-100','dark:bg-gray-700','font-semibold');
-        const href = a.getAttribute('href') || '';
-        if (href.endsWith(r)) a.classList.add('bg-gray-100','dark:bg-gray-700','font-semibold');
+        sections.forEach(sec => sec.classList.add("hidden"));
+        document.getElementById(target).classList.remove("hidden");
+
+        tabBtns.forEach(b => b.classList.remove(
+          "bg-sky-500/20", "text-sky-300", "border", "border-sky-400/40"
+        ));
+
+        btn.classList.add(
+          "bg-sky-500/20", "text-sky-300", "border", "border-sky-400/40"
+        );
       });
-    }
-
-    function onHashChange() {
-      const hash = location.hash.replace('#', '') || '/admin';
-      showRoute(hash);
-    }
-    window.addEventListener('hashchange', onHashChange);
-    onHashChange();
-
-    // Mobile sidebar toggle
-    const mobileSidebar = document.getElementById('mobile-sidebar');
-    document.getElementById('btn-open-sidebar').addEventListener('click', () => mobileSidebar.classList.remove('hidden'));
-    document.getElementById('btn-close-mobile').addEventListener('click', () => mobileSidebar.classList.add('hidden'));
-    mobileSidebar.addEventListener('click', (e) => { if (e.target === mobileSidebar) mobileSidebar.classList.add('hidden'); });
-
-    // Desktop logout
-    document.getElementById('logout-desktop').addEventListener('click', () => { localStorage.removeItem('userData'); window.location.href = '/'; });
-
-    // ---------- Theme (dark mode) ----------
-    const themeKey = 'admin_theme';
-    function setTheme(dark) {
-      if (dark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
-      document.getElementById('theme-status').textContent = dark ? 'Oscuro' : 'Claro';
-      updateThemeIcons(dark);
-      localStorage.setItem(themeKey, dark ? 'dark' : 'light');
-    }
-    function updateThemeIcons(isDark) {
-      const darkSvg = '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
-      const lightSvg = '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636"/>';
-      document.getElementById('icon-theme').innerHTML = isDark ? darkSvg : lightSvg;
-      document.getElementById('icon-theme-mobile').innerHTML = isDark ? darkSvg : lightSvg;
-    }
-    const savedTheme = localStorage.getItem(themeKey);
-    if (savedTheme) setTheme(savedTheme === 'dark'); else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.getElementById('btn-theme').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-    document.getElementById('btn-theme-mobile').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-    document.getElementById('btn-theme-settings').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-
-
-     // ---------- User data and avatar ----------
-    // ---------- User data and avatar ----------
-    const user = JSON.parse(localStorage.getItem('userData')) || { id: 'Admin', rol: 'administrador' };
-    document.getElementById('sidebar-rol').textContent = user.rol || '';
-    document.getElementById('user-name-top').textContent = user.id || 'Admin';
-    document.getElementById('user-role-top').textContent = user.rol || '';
-    document.getElementById('topbar-usuario').textContent = user.id || 'Admin';
-    document.getElementById('topbar-rol').textContent = user.rol || '';
-    document.getElementById('m-name').textContent = user.id || 'Admin';
-    document.getElementById('m-role').textContent = user.rol || 'administrador';
-    document.getElementById('profile-name').textContent = user.id || 'Admin';
-    document.getElementById('profile-role').textContent = user.rol || 'administrador';
-
-    const avatar = document.getElementById('avatar');
-    const initials = (user.id || 'A').split(' ').map(s => s[0]).splice(0,2).join('').toUpperCase();
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' fill='${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='36' fill='${document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827'}' font-family='Arial'>${initials}</text></svg>`;
-    avatar.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-
-    // ---------- Demo persistence (localStorage) ----------
-    const studentsKey = 'admin_students_demo';
-    const tutKey = 'admin_tutorias_demo';
-    const usersKey = 'admin_users_demo';
-
-    function saveStudent(s){ const arr = JSON.parse(localStorage.getItem(studentsKey)||'[]'); arr.push(s); localStorage.setItem(studentsKey, JSON.stringify(arr)); renderStudents(); }
-    function saveTutoria(t){ const arr = JSON.parse(localStorage.getItem(tutKey)||'[]'); arr.push(t); localStorage.setItem(tutKey, JSON.stringify(arr)); renderTutorias(); }
-    function saveUser(u){ const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); arr.push(u); localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); }
-
-    // Quick form
-    document.getElementById('quick-form').addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const student = document.getElementById('tf-student').value.trim();
-      if(!student) return alert('Ingrese nombre del estudiante');
-      const type = document.getElementById('tf-type').value;
-      const notes = document.getElementById('tf-notes').value;
-      const date = document.getElementById('tf-date').value || new Date().toISOString().slice(0,10);
-      saveStudent({name: student, code: '—', carrera: '—', last: date});
-      saveTutoria({date, student, type, tutor: user.id, notes});
-      document.getElementById('recent-actions').innerHTML = `<li class="text-sm">${new Date().toLocaleString()}: Registro rápido <strong>${student}</strong></li>` + document.getElementById('recent-actions').innerHTML;
-      document.getElementById('quick-form').reset();
-      refreshCounts();
     });
 
-    // User form
-    document.getElementById('btn-save-user').addEventListener('click', () => {
-      const n = document.getElementById('u-name').value.trim();
-      const em = document.getElementById('u-email').value.trim();
-      const r = document.getElementById('u-role').value;
-      if(!n||!em) return alert('Complete nombre y correo');
-      saveUser({name: n, email: em, role: r});
-      document.getElementById('user-form').reset();
-      alert('Usuario guardado (demo).');
-      refreshCounts();
+    /* ---------------- API HELPERS ---------------- */
+    const API = "/api/admin";
+
+    async function fetchJSON(url, options = {}) {
+      const r = await fetch(url, options);
+      return r.json();
+    }
+
+    /* ---------------- DASHBOARD CARDS ---------------- */
+    async function cargarResumen() {
+      const data = await fetchJSON(`${API}/resumen`);
+      document.getElementById("card-estudiantes").textContent = data.estudiantes;
+      document.getElementById("card-tutores").textContent = data.tutores;
+      document.getElementById("card-cronos").textContent = data.cronogramas;
+      document.getElementById("card-tutorias").textContent = data.tutorias;
+    }
+
+    /* ---------------- LISTA USUARIOS ---------------- */
+    async function cargarUsuarios() {
+      const data = await fetchJSON(`${API}/usuarios`);
+      const cont = document.getElementById("lista-usuarios");
+
+      cont.innerHTML = data.usuarios
+        .map(u => `
+          <div class="rounded-xl bg-slate-900/60 border border-slate-700 px-4 py-3">
+            <p class="text-sky-300 font-semibold">${u.nombre} ${u.apellido}</p>
+            <p class="text-sm">${u.email}</p>
+            <p class="text-xs text-slate-400">${u.nombre_rol}</p>
+          </div>
+        `)
+        .join("");
+    }
+
+    /* ---------------- CREAR USUARIO ---------------- */
+    const modalUser = document.getElementById("modal-user");
+    document.getElementById("btn-nuevo-usuario").onclick = () =>
+      modalUser.classList.add("show");
+
+    /* cerrar modal */
+    document.querySelectorAll(".modal button").forEach(btn => {
+      if (btn.textContent === "Cancelar")
+        btn.onclick = () => modalUser.classList.remove("show");
     });
-    document.getElementById('btn-clear-user').addEventListener('click', () => document.getElementById('user-form').reset());
 
-    // New user button opens users panel
-    document.getElementById('btn-add-user').addEventListener('click', ()=> location.hash = '/usuarios');
+    document.getElementById("crear-usuario").onclick = async () => {
+      const payload = {
+        nombre: document.getElementById("u-nombre").value,
+        apellido: document.getElementById("u-apellido").value,
+        email: document.getElementById("u-email").value,
+        password: document.getElementById("u-pass").value,
+        rol: Number(document.getElementById("u-rol").value)
+      };
 
-    // Export users CSV
-    document.getElementById('btn-export-users').addEventListener('click', ()=>{
-      const arr = JSON.parse(localStorage.getItem(usersKey)||'[]');
-      if(!arr.length) return alert('No hay usuarios para exportar.');
-      const csv = ['Nombre,Correo,Rol', ...arr.map(u=>`"${u.name}","${u.email}","${u.role}"`)].join('\n');
-      const blob = new Blob([csv], {type: 'text/csv'}); const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'usuarios.csv'; a.click(); URL.revokeObjectURL(url);
-    });
+      const res = await fetchJSON(`${API}/usuarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-    // Render functions
-    function renderUsers(){
-      const arr = JSON.parse(localStorage.getItem(usersKey)||'[]');
-      const tbody = document.getElementById('users-tbody');
-      document.getElementById('count-users').textContent = arr.length;
-      if(!arr.length){ tbody.innerHTML = '<tr><td class="p-3" colspan="5">No hay usuarios. Crea uno con "Nuevo Usuario".</td></tr>'; return; }
-      tbody.innerHTML = arr.map((u,i) => `
-        <tr class="border-t border-gray-100 dark:border-gray-700">
-          <td class="px-3 py-2">${i+1}</td>
-          <td class="px-3 py-2">${u.name}</td>
-          <td class="px-3 py-2">${u.email}</td>
-          <td class="px-3 py-2">${u.role}</td>
-          <td class="px-3 py-2">
-            <button class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700" data-index="${i}" onclick="editUser(event)">Editar</button>
-            <button class="text-xs px-2 py-1 rounded bg-red-50 dark:bg-red-700/30" data-index="${i}" onclick="removeUser(event)">Eliminar</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-    window.editUser = function(e){
-      const i = +e.target.getAttribute('data-index'); const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); const u = arr[i];
-      if(!u) return; const newName = prompt('Editar nombre', u.name); if(newName){ u.name = newName; arr[i]=u; localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); }
-    }
-    window.removeUser = function(e){ const i = +e.target.getAttribute('data-index'); const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); if(!confirm('Eliminar usuario?')) return; arr.splice(i,1); localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); refreshCounts(); }
+      alert(res.message || "Usuario creado");
+      modalUser.classList.remove("show");
+      cargarUsuarios();
+    };
 
-    function renderStudents(){
-      const arr = JSON.parse(localStorage.getItem(studentsKey)||'[]');
-      document.getElementById('count-students').textContent = arr.length;
-    }
+    /* ---------------- ASIGNACIÓN ---------------- */
+    const modalAsignar = document.getElementById("modal-asignar");
 
-    function renderTutorias(){
-      const arr = JSON.parse(localStorage.getItem(tutKey)||'[]').slice().reverse();
-      const tbody = document.getElementById('tutorias-tbody');
-      document.getElementById('count-month').textContent = arr.length;
-      if(!arr.length){ tbody.innerHTML = '<tr><td class="p-3" colspan="5">No hay tutorías registradas.</td></tr>'; return; }
-      tbody.innerHTML = arr.map(t => `
-        <tr class="border-t border-gray-100 dark:border-gray-700">
-          <td class="px-3 py-2">${new Date(t.date).toLocaleString()}</td>
-          <td class="px-3 py-2">${t.student}</td>
-          <td class="px-3 py-2">${t.type}</td>
-          <td class="px-3 py-2">${t.tutor || '—'}</td>
-          <td class="px-3 py-2">
-            <button class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700" onclick="viewTutoria('${encodeURIComponent(JSON.stringify(t))}')">Ver</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-    window.viewTutoria = function(encoded){ const t = JSON.parse(decodeURIComponent(encoded)); alert('Tutoría:\\n' + JSON.stringify(t,null,2)); }
+    document.getElementById("btn-asignar").onclick = async () => {
+      modalAsignar.classList.add("show");
 
-    // Refresh counters
-    function refreshCounts(){ const users = JSON.parse(localStorage.getItem(usersKey)||'[]').length; const students = JSON.parse(localStorage.getItem(studentsKey)||'[]').length; const tut = JSON.parse(localStorage.getItem(tutKey)||'[]').length; document.getElementById('count-users').textContent = users; document.getElementById('count-students').textContent = students; document.getElementById('count-month').textContent = tut; document.getElementById('count-today').textContent = 0; }
+      const alumnos = await fetchJSON(`${API}/alumnos/disponibles`);
+      const tutores = await fetchJSON(`${API}/tutores/disponibles`);
 
-    // Search and filter (example for tutorias)
-    // Export and other features could call backend endpoints when available.
+      const selAl = document.getElementById("sel-alumnos");
+      const selTu = document.getElementById("sel-tutores");
 
-    // Init: render persisted demo data
-    renderUsers(); renderStudents(); renderTutorias(); refreshCounts();
+      selAl.innerHTML = alumnos
+        .map(a => `<option value="${a.id_alumno}">${a.codigo_estudiante} - ${a.nombre}</option>`)
+        .join("");
 
-    // Keyboard shortcut R to focus quick-student
-    window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'r' && !(e.ctrlKey||e.metaKey)) { document.getElementById('tf-student').focus(); } });
+      selTu.innerHTML = tutores
+        .map(t => `<option value="${t.id_tutor}">${t.codigo_docente} - ${t.nombre}</option>`)
+        .join("");
+    };
 
-    // Logout (top-right button)
-    document.getElementById('logout-desktop').addEventListener('click', () => { localStorage.removeItem('userData'); window.location.href = '/'; });
+    document.getElementById("asignar-btn").onclick = async () => {
+      const payload = {
+        id_alumno: Number(document.getElementById("sel-alumnos").value),
+        id_tutor: Number(document.getElementById("sel-tutores").value)
+      };
 
-    // Ensure PDF link points to your uploaded file (local path)
-    document.getElementById('pdf-link').href = 'sandbox:/mnt/data/Proyecto semestral 2025-2.pdf';
+      const res = await fetchJSON(`${API}/asignar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert(res.message);
+      modalAsignar.classList.remove("show");
+    };
+
+    /* ---------------- INICIALIZAR ---------------- */
+    cargarResumen();
+    cargarUsuarios();
 
   </script>
+
 </body>
 </html>
