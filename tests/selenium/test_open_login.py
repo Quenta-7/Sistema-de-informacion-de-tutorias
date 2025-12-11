@@ -6,7 +6,7 @@ import time
 service = Service("chromedriver.exe")
 driver = webdriver.Chrome(service=service)
 
-driver.get("http://localhost:5500/frontend/login.html")
+driver.get("http://localhost:8080/")
 time.sleep(2)
 
 driver.quit()
