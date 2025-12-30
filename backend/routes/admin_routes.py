@@ -5,7 +5,8 @@ from models.admin_model import (
     crear_usuario,
     tutores_disponibles,
     alumnos_disponibles,
-    asignar_tutor
+    asignar_tutor,
+    listar_materias
 )
 
 admin_bp = Blueprint("admin", __name__)
@@ -55,12 +56,21 @@ def get_tutores_disp():
 def get_alumnos_disp():
     return jsonify(alumnos_disponibles())
 
+@admin_bp.get("/materias")
+def get_materias_disp():
+    return jsonify(listar_materias())
 
-# =============================
-# ASIGNAR TUTORADO
-# =============================
+
 @admin_bp.post("/asignar")
 def post_asignar():
     data = request.json
-    asignar_tutor(data["id_alumno"], data["id_tutor"])
-    return jsonify({"message": "Asignación realizada correctamente"})
+    try:
+        # Extraemos los 3 datos necesarios
+        id_al = data["id_alumno"]
+        id_tu = data["id_tutor"]
+        id_ma = data.get("id_materia", 1) # Usamos 1 por defecto si no viene
+        
+        asignar_tutor(id_al, id_tu, id_ma)
+        return jsonify({"message": "Asignación realizada correctamente"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400

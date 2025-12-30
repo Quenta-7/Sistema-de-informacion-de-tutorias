@@ -13,11 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    // Detectar si es local o producción
-    const BASE_URL =
-        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-            ? "http://127.0.0.1:8080"
-            : "http://34.60.247.196:8080";
+   
+    // Detectar si es local o producción de forma automática
+    const BASE_URL = window.location.origin;
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault();

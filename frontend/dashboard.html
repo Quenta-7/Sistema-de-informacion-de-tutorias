@@ -3,348 +3,318 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Administrador – Sistema de Tutorías UNSAAC</title>
+  <title>Dashboard Pro – Sistema de Tutorías</title>
+  <link rel="icon" type="image/jpeg" href="static/img/logo_info.jpg">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     body {
-      background: radial-gradient(circle at 10% 10%, #0ea5e9 0%, #020617 70%);
+      font-family: 'Inter', sans-serif;
+      background-color: #020617;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
     }
 
-    /* MODAL BASE */
+    /* Efecto de Vidrio Pulido */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Animación de entrada para las tarjetas */
+    .card-stat {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-stat:hover {
+      transform: translateY(-5px);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    .card-stat::after {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+
+    .card-stat:hover::after { opacity: 1; }
+
+    /* Scrollbar estilizada */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
     .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
       display: none;
-      align-items: center;
-      justify-content: center;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
     }
-
-    .modal.show {
-      display: flex;
-    }
-
+    .modal.show { display: flex; }
   </style>
 </head>
 
-<body class="min-h-screen p-6 text-white">
+<body class="min-h-screen text-slate-200">
 
-  <!-- CONTENEDOR GENERAL -->
-  <div class="w-full max-w-7xl mx-auto flex rounded-3xl border border-sky-500/30 bg-slate-950/60 
-              backdrop-blur-xl shadow-[0_0_40px_rgba(56,189,248,0.35)] overflow-hidden">
+  <div class="flex h-screen overflow-hidden">
 
-    <!-- ===================== SIDEBAR ===================== -->
-    <aside class="w-72 border-r border-sky-400/20 p-6 flex flex-col justify-between bg-slate-950/60">
-
-      <!-- Perfil -->
-      <div>
-        <div class="flex items-center space-x-3 mb-6">
-          <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-600 
-                      flex items-center justify-center text-xl font-bold text-slate-900">
-            A
+    <aside class="w-80 glass-card m-4 rounded-3xl flex flex-col p-6 hidden lg:flex">
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="bg-sky-500 p-2.5 rounded-2xl shadow-lg shadow-sky-500/20">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
           </div>
-
-          <div>
-            <p class="text-xs uppercase tracking-widest text-yellow-400/80">Administrador</p>
-            <p id="admin-nombre" class="text-sm font-semibold text-slate-100">—</p>
-          </div>
+          <h2 class="font-bold text-xl tracking-tight text-white">Tutorías<span class="text-sky-500">PRO</span></h2>
         </div>
 
-        <!-- MENÚ -->
-        <nav class="space-y-2 text-sm">
-
-          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl bg-sky-500/20 
-                         text-sky-300 border border-sky-400/40"
-                  data-target="sec-dashboard">
-            📊 Panel General
+        <nav class="space-y-1">
+          <button data-target="sec-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium transition-all">
+            📊 Panel Principal
           </button>
-
-          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl hover:bg-slate-800/80
-                          text-slate-200 border border-transparent"
-                  data-target="sec-usuarios">
-            🛂 Gestión de Usuarios
+          <button data-target="sec-usuarios" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all">
+            👥 Gestión Usuarios
           </button>
-
-          <button class="tab-btn w-full text-left px-4 py-2 rounded-xl hover:bg-slate-800/80
-                          text-slate-200 border border-transparent"
-                  data-target="sec-asignaciones">
-            🔄 Asignar Tutores
+          <button data-target="sec-asignaciones" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all">
+            🔗 Asignar Tutorados
           </button>
-
         </nav>
       </div>
 
-      <button id="logout-btn"
-              class="w-full px-3 py-2 mt-6 rounded-xl bg-rose-600/90 hover:bg-rose-500 
-                     text-sm font-semibold transition">
-        Cerrar sesión
-      </button>
+      <div class="mt-auto pt-6 border-t border-slate-800">
+        <div class="flex items-center gap-3 p-3 mb-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center font-bold text-white shadow-lg" id="avatar-letra">A</div>
+          <div class="overflow-hidden">
+            <p class="text-sm font-semibold text-white truncate" id="admin-nombre">Admin</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Sesión de Administrador</p>
+          </div>
+        </div>
+        <button id="logout-btn" class="w-full py-3 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white font-semibold transition-all">
+          Cerrar Sesión
+        </button>
+      </div>
     </aside>
 
-    <!-- ===================== CONTENIDO ===================== -->
-    <main class="flex-1 p-10 space-y-10">
-
-      <!-- Encabezado -->
-      <header>
-        <h1 class="text-3xl font-semibold text-slate-50">Panel del Administrador</h1>
-        <p class="text-slate-400 text-sm">Control general del sistema de tutorías UNSAAC.</p>
+    <main class="flex-1 overflow-y-auto p-8">
+      
+      <header class="flex justify-between items-end mb-10">
+        <div>
+          <h1 class="text-4xl font-bold text-white mb-2">Bienvenido, Administrador</h1>
+          <p class="text-slate-400">Resumen general de las tutorías en Ingeniería de Sistemas.</p>
+        </div>
+        <div class="text-right hidden sm:block">
+          <p class="text-sm text-slate-500" id="fecha-actual">Cargando fecha...</p>
+        </div>
       </header>
 
-      <!-- ===================== SECCIONES ===================== -->
-
-      <!-- ----------- PANEL GENERAL ----------- -->
-      <section id="sec-dashboard" class="section">
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-          <div class="rounded-2xl border border-sky-400/20 bg-slate-900/70 p-4">
-            <p class="text-[10px] uppercase tracking-widest text-sky-300">Estudiantes</p>
-            <p id="card-estudiantes" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+      <section id="sec-dashboard" class="section space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-sky-500/20 rounded-2xl flex items-center justify-center text-sky-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Estudiantes</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-estudiantes">0</h3>
           </div>
 
-          <div class="rounded-2xl border border-emerald-400/20 bg-slate-900/70 p-4">
-            <p class="text-[10px] uppercase tracking-widest text-emerald-300">Tutores</p>
-            <p id="card-tutores" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Tutores Activos</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-tutores">0</h3>
           </div>
 
-          <div class="rounded-2xl border border-amber-400/20 bg-slate-900/70 p-4">
-            <p class="text-[10px] uppercase tracking-widest text-amber-300">Cronogramas</p>
-            <p id="card-cronos" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Cronogramas</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-cronos">0</h3>
           </div>
 
-          <div class="rounded-2xl border border-fuchsia-400/20 bg-slate-900/70 p-4">
-            <p class="text-[10px] uppercase tracking-widest text-fuchsia-300">Tutorías</p>
-            <p id="card-tutorias" class="text-3xl font-semibold text-slate-100 mt-1">—</p>
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-rose-500/20 rounded-2xl flex items-center justify-center text-rose-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Solicitudes</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-tutorias">0</h3>
           </div>
-
         </div>
       </section>
 
-
-      <!-- ----------- USUARIOS ----------- -->
       <section id="sec-usuarios" class="section hidden">
+        <div class="glass-card rounded-3xl p-8">
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+            <h2 class="text-2xl font-bold text-white">Directorio de Usuarios</h2>
+            <button id="btn-nuevo-usuario" class="px-6 py-3 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-2xl shadow-lg shadow-sky-500/20 transition-all">
+              + Registrar Nuevo
+            </button>
+          </div>
+          <div id="lista-usuarios" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </div>
+      </section>
 
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-slate-100">Gestión de Usuarios</h2>
-
-          <button id="btn-nuevo-usuario"
-                  class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 font-semibold">
-            ➕ Crear Usuario
+      <section id="sec-asignaciones" class="section hidden">
+        <div class="glass-card rounded-3xl p-10 text-center max-w-2xl mx-auto">
+          <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+          </div>
+          <h2 class="text-3xl font-bold text-white mb-4">Vincular Tutorado</h2>
+          <p class="text-slate-400 mb-8 text-lg">Asigna un tutor académico a un estudiante y define la materia de seguimiento.</p>
+          <button id="btn-asignar" class="px-10 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all uppercase tracking-widest">
+            Iniciar Nueva Asignación
           </button>
         </div>
-
-        <div id="lista-usuarios" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-          Cargando...
-        </div>
-      </section>
-
-
-      <!-- ----------- ASIGNACIONES ----------- -->
-      <section id="sec-asignaciones" class="section hidden">
-
-        <h2 class="text-xl font-semibold text-slate-100 mb-4">Asignación de Tutorados</h2>
-
-        <button id="btn-asignar"
-                class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-semibold">
-          ➕ Nueva Asignación
-        </button>
-
-        <div id="resultado-asignacion" class="mt-4 text-slate-300"></div>
-
       </section>
 
     </main>
   </div>
 
-  <!-- ================= MODAL CREAR USUARIO ================= -->
-  <div id="modal-user" class="modal">
-    <div class="bg-slate-900 rounded-xl p-6 w-96 border border-sky-500/30">
-
-      <h2 class="text-xl font-semibold mb-4">Crear Usuario</h2>
-
-      <input id="u-nombre" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Nombre">
-      <input id="u-apellido" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Apellido">
-      <input id="u-email" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-2" placeholder="Email">
-      <input id="u-pass" type="password" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4" placeholder="Contraseña">
-
-      <label class="text-sm text-slate-300">Rol</label>
-      <select id="u-rol" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4">
-        <option value="1">Administrador</option>
-        <option value="2">Tutor</option>
-        <option value="3">Alumno</option>
-        <option value="4">Verificador</option>
-      </select>
-
-      <div class="flex justify-end gap-2">
-        <button class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600">Cancelar</button>
-        <button id="crear-usuario" class="px-3 py-2 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold">Crear</button>
+  <div id="modal-asignar" class="modal fixed inset-0 items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md rounded-[2.5rem] p-10 relative border-sky-500/30">
+      <h2 class="text-2xl font-black text-white mb-8 text-center uppercase tracking-tighter">Nueva Vinculación</h2>
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Estudiante Seleccionado</label>
+          <select id="sel-alumnos" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Tutor Académico</label>
+          <select id="sel-tutores" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 outline-none transition-all"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Materia / Área</label>
+          <select id="sel-materias" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 outline-none transition-all"></select>
+        </div>
       </div>
 
+      <div class="flex flex-col gap-3 mt-10">
+        <button id="asignar-btn" class="w-full py-4 bg-sky-500 text-white font-bold rounded-2xl shadow-lg hover:bg-sky-400 transition-all">Confirmar Asignación</button>
+        <button class="btn-cancelar w-full py-4 bg-slate-800 text-slate-400 font-semibold rounded-2xl hover:bg-slate-700 transition-all">Descartar</button>
+      </div>
     </div>
   </div>
 
-  <!-- ================= MODAL ASIGNACIÓN ================= -->
-  <div id="modal-asignar" class="modal">
-    <div class="bg-slate-900 rounded-xl p-6 w-96 border border-sky-500/30">
-
-      <h2 class="text-xl font-semibold mb-4">Asignar Tutor a Alumno</h2>
-
-      <label>Alumno</label>
-      <select id="sel-alumnos" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4"></select>
-
-      <label>Tutor</label>
-      <select id="sel-tutores" class="w-full p-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 mb-4"></select>
-
-      <div class="flex justify-end gap-2">
-        <button class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600">Cancelar</button>
-        <button id="asignar-btn" class="px-3 py-2 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold">Asignar</button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ================= SCRIPTS ================= -->
   <script>
-    /* ---------------- VALIDACIÓN LOGIN ---------------- */
-    const admin = JSON.parse(localStorage.getItem("userData"));
-    if (!admin || admin.rol !== 1) window.location.href = "/";
+    const API = "/api/admin";
 
-    document.getElementById("admin-nombre").textContent =
-      admin.nombre + " " + (admin.apellido || "");
-
-    document.getElementById("logout-btn").onclick = () => {
-      localStorage.removeItem("userData");
-      window.location.href = "/";
-    };
-
-    /* ---------------- TAB NAVIGATION ---------------- */
+    // Manejo de Tabs
     const tabBtns = document.querySelectorAll(".tab-btn");
     const sections = document.querySelectorAll(".section");
 
     tabBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.onclick = () => {
         const target = btn.dataset.target;
-
-        sections.forEach(sec => sec.classList.add("hidden"));
+        sections.forEach(s => s.classList.add("hidden"));
         document.getElementById(target).classList.remove("hidden");
-
-        tabBtns.forEach(b => b.classList.remove(
-          "bg-sky-500/20", "text-sky-300", "border", "border-sky-400/40"
-        ));
-
-        btn.classList.add(
-          "bg-sky-500/20", "text-sky-300", "border", "border-sky-400/40"
-        );
-      });
-    });
-
-    /* ---------------- API HELPERS ---------------- */
-    const API = "/api/admin";
-
-    async function fetchJSON(url, options = {}) {
-      const r = await fetch(url, options);
-      return r.json();
-    }
-
-    /* ---------------- DASHBOARD CARDS ---------------- */
-    async function cargarResumen() {
-      const data = await fetchJSON(`${API}/resumen`);
-      document.getElementById("card-estudiantes").textContent = data.estudiantes;
-      document.getElementById("card-tutores").textContent = data.tutores;
-      document.getElementById("card-cronos").textContent = data.cronogramas;
-      document.getElementById("card-tutorias").textContent = data.tutorias;
-    }
-
-    /* ---------------- LISTA USUARIOS ---------------- */
-    async function cargarUsuarios() {
-      const data = await fetchJSON(`${API}/usuarios`);
-      const cont = document.getElementById("lista-usuarios");
-
-      cont.innerHTML = data.usuarios
-        .map(u => `
-          <div class="rounded-xl bg-slate-900/60 border border-slate-700 px-4 py-3">
-            <p class="text-sky-300 font-semibold">${u.nombre} ${u.apellido}</p>
-            <p class="text-sm">${u.email}</p>
-            <p class="text-xs text-slate-400">${u.nombre_rol}</p>
-          </div>
-        `)
-        .join("");
-    }
-
-    /* ---------------- CREAR USUARIO ---------------- */
-    const modalUser = document.getElementById("modal-user");
-    document.getElementById("btn-nuevo-usuario").onclick = () =>
-      modalUser.classList.add("show");
-
-    /* cerrar modal */
-    document.querySelectorAll(".modal button").forEach(btn => {
-      if (btn.textContent === "Cancelar")
-        btn.onclick = () => modalUser.classList.remove("show");
-    });
-
-    document.getElementById("crear-usuario").onclick = async () => {
-      const payload = {
-        nombre: document.getElementById("u-nombre").value,
-        apellido: document.getElementById("u-apellido").value,
-        email: document.getElementById("u-email").value,
-        password: document.getElementById("u-pass").value,
-        rol: Number(document.getElementById("u-rol").value)
+        
+        tabBtns.forEach(b => {
+          b.classList.remove("bg-sky-500/10", "text-sky-400", "border-sky-500/20");
+          b.classList.add("text-slate-400");
+        });
+        btn.classList.add("bg-sky-500/10", "text-sky-400", "border-sky-500/20");
       };
+    });
 
-      const res = await fetchJSON(`${API}/usuarios`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+    // Helper API
+    async function fetchJSON(u, o = {}) {
+      try {
+        const r = await fetch(u, o);
+        return r.json();
+      } catch (e) { console.error("Error API:", e); }
+    }
 
-      alert(res.message || "Usuario creado");
-      modalUser.classList.remove("show");
-      cargarUsuarios();
-    };
+    async function cargarResumen() {
+      const d = await fetchJSON(`${API}/resumen`);
+      if(!d) return;
+      document.getElementById("card-estudiantes").innerText = d.estudiantes;
+      document.getElementById("card-tutores").innerText = d.tutores;
+      document.getElementById("card-cronos").innerText = d.cronogramas;
+      document.getElementById("card-tutorias").innerText = d.tutorias;
+    }
 
-    /* ---------------- ASIGNACIÓN ---------------- */
+    async function cargarUsuarios() {
+      const d = await fetchJSON(`${API}/usuarios`);
+      const cont = document.getElementById("lista-usuarios");
+      cont.innerHTML = d.usuarios.map(u => `
+        <div class="glass-card p-5 rounded-2xl flex items-center gap-4 hover:border-sky-500/30 transition-all">
+          <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center font-bold text-sky-500">${u.nombre[0]}</div>
+          <div>
+            <h4 class="text-white font-semibold">${u.nombre} ${u.apellido}</h4>
+            <p class="text-xs text-slate-500">${u.email}</p>
+            <span class="text-[10px] px-2 py-0.5 bg-slate-800 border border-slate-700 rounded-full text-slate-400 mt-1 inline-block uppercase">${u.nombre_rol}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Modal Asignar
     const modalAsignar = document.getElementById("modal-asignar");
-
     document.getElementById("btn-asignar").onclick = async () => {
       modalAsignar.classList.add("show");
-
-      const alumnos = await fetchJSON(`${API}/alumnos/disponibles`);
-      const tutores = await fetchJSON(`${API}/tutores/disponibles`);
-
-      const selAl = document.getElementById("sel-alumnos");
-      const selTu = document.getElementById("sel-tutores");
-
-      selAl.innerHTML = alumnos
-        .map(a => `<option value="${a.id_alumno}">${a.codigo_estudiante} - ${a.nombre}</option>`)
-        .join("");
-
-      selTu.innerHTML = tutores
-        .map(t => `<option value="${t.id_tutor}">${t.codigo_docente} - ${t.nombre}</option>`)
-        .join("");
+      const [a, t, m] = await Promise.all([
+        fetchJSON(`${API}/alumnos/disponibles`),
+        fetchJSON(`${API}/tutores/disponibles`),
+        fetchJSON(`${API}/materias`)
+      ]);
+      document.getElementById("sel-alumnos").innerHTML = a.map(x => `<option value="${x.id_alumno}">${x.nombre}</option>`).join("");
+      document.getElementById("sel-tutores").innerHTML = t.map(x => `<option value="${x.id_tutor}">${x.nombre}</option>`).join("");
+      document.getElementById("sel-materias").innerHTML = m.map(x => `<option value="${x.id_materia}">${x.nombre_materia}</option>`).join("");
     };
+
+    document.querySelectorAll(".btn-cancelar").forEach(b => {
+      b.onclick = () => b.closest(".modal").classList.remove("show");
+    });
 
     document.getElementById("asignar-btn").onclick = async () => {
       const payload = {
         id_alumno: Number(document.getElementById("sel-alumnos").value),
-        id_tutor: Number(document.getElementById("sel-tutores").value)
+        id_tutor: Number(document.getElementById("sel-tutores").value),
+        id_materia: Number(document.getElementById("sel-materias").value)
       };
-
-      const res = await fetchJSON(`${API}/asignar`, {
+      const r = await fetchJSON(`${API}/asignar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {"Content-Type":"application/json"},
         body: JSON.stringify(payload)
       });
-
-      alert(res.message);
+      alert(r.message);
       modalAsignar.classList.remove("show");
+      cargarResumen();
     };
 
-    /* ---------------- INICIALIZAR ---------------- */
+    // Logout y Login Data
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if(user) {
+      document.getElementById("admin-nombre").innerText = user.nombre;
+      document.getElementById("avatar-letra").innerText = user.nombre[0];
+    }
+    document.getElementById("fecha-actual").innerText = new Intl.DateTimeFormat('es-PE', { dateStyle: 'full' }).format(new Date());
+
     cargarResumen();
     cargarUsuarios();
+  /* ---------------- CERRAR SESIÓN ---------------- */
+  const btnLogout = document.getElementById("logout-btn");
 
+  if (btnLogout) {
+    btnLogout.onclick = (e) => {
+      e.preventDefault();
+      // 1. Limpiamos los datos del usuario del navegador
+      localStorage.removeItem("userData");
+      // 2. Redirigimos al login (página principal)
+      window.location.href = "/";
+    };
+  }
   </script>
-
 </body>
 </html>

@@ -24,8 +24,8 @@ def obtener_resumen():
     cur = conn.cursor()
 
     consultas = {
-        "estudiantes": "SELECT COUNT(*) FROM alumno;",
-        "tutores": "SELECT COUNT(*) FROM tutor;",
+        "estudiantes": "SELECT COUNT(*) FROM usuarios WHERE id_rol = 3;", # Cuenta a todos los usuarios alumnos
+        "tutores": "SELECT COUNT(*) FROM usuarios WHERE id_rol = 2;",
         "cronogramas": "SELECT COUNT(*) FROM cronograma;",
         "tutorias": "SELECT COUNT(*) FROM registro_tutoria;"
     }
@@ -84,35 +84,53 @@ def listar_usuarios():
 #  CREAR USUARIO (ADMIN CREA NUEVOS USUARIOS)
 # ====================================================
 def crear_usuario(nombre, apellido, email, password, id_rol):
-    """
-    Crea un registro en la tabla USUARIOS.
-    Devuelve el id_usuario recién creado.
-    """
     conn = get_connection()
     cur = conn.cursor()
+    try:
+        # Encriptar contraseña
+        password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-    # Hash correcto con bcrypt (texto, no bytea en la BD)
-    password_hash = bcrypt.hashpw(
-        password.encode("utf-8"),
-        bcrypt.gensalt()
-    ).decode("utf-8")
+        # 1. Insertar en la tabla principal de usuarios
+        sql_user = """
+            INSERT INTO usuarios (nombre, apellido, email, password_hash, id_rol, fecha_registro)
+            VALUES (%s, %s, %s, %s, %s, NOW())
+            RETURNING id_usuario;
+        """
+        cur.execute(sql_user, (nombre, apellido, email, password_hash, id_rol))
+        nuevo_id = cur.fetchone()[0]
 
-    sql = """
-        INSERT INTO usuarios
-            (nombre, apellido, email, password_hash, id_rol, telefono, fecha_registro)
-        VALUES
-            (%s, %s, %s, %s, %s, NULL, NOW())
-        RETURNING id_usuario;
-    """
+        # 2. Insertar en tablas específicas según el Rol
+        if id_rol == 2:  # TUTOR
+            sql_tutor = """
+                INSERT INTO tutor (id_usuario, codigo_docente, departamento_academico)
+                VALUES (%s, %s, %s);
+            """
+            # Usamos valores genéricos que luego el admin puede editar
+            cur.execute(sql_tutor, (nuevo_id, f"DOC-{nuevo_id}", "Sistemas"))
 
-    cur.execute(sql, (nombre, apellido, email, password_hash, id_rol))
-    nuevo_id = cur.fetchone()[0]
+        elif id_rol == 3:  # ALUMNO
+            sql_alumno = """
+                INSERT INTO alumno (id_usuario, codigo_estudiante, programa_estudio, semestre_actual)
+                VALUES (%s, %s, %s, %s);
+            """
+            cur.execute(sql_alumno, (nuevo_id, f"EST-{nuevo_id}", "Ing. Informática", "1"))
 
-    conn.commit()
-    cur.close()
-    conn.close()
-    return nuevo_id
+        elif id_rol == 4:  # VERIFICADOR
+            sql_verif = """
+                INSERT INTO verificador (id_usuario, cargo, area)
+                VALUES (%s, %s, %s);
+            """
+            cur.execute(sql_verif, (nuevo_id, "Verificador General", "Bienestar"))
 
+        conn.commit()
+        return nuevo_id
+    except Exception as e:
+        conn.rollback()
+        print(f"Error al crear usuario completo: {e}")
+        raise e
+    finally:
+        cur.close()
+        conn.close()
 
 # ====================================================
 #  TUTORES DISPONIBLES
