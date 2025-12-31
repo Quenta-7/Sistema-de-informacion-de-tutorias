@@ -1,544 +1,320 @@
 <!DOCTYPE html>
-<html lang="es" class="antialiased">
+<html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Panel Administrador — Sistema de Tutorías</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Pro – Sistema de Tutorías</title>
+  <link rel="icon" type="image/jpeg" href="static/img/logo_info.jpg">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    .theme-transition { transition: background-color .25s, color .25s; }
-    ::-webkit-scrollbar { width: 10px; height: 10px; }
-    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 10px; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #020617;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.15) 0px, transparent 50%);
+    }
+
+    /* Efecto de Vidrio Pulido */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Animación de entrada para las tarjetas */
+    .card-stat {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-stat:hover {
+      transform: translateY(-5px);
+      border-color: rgba(56, 189, 248, 0.5);
+    }
+
+    .card-stat::after {
+      content: "";
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+
+    .card-stat:hover::after { opacity: 1; }
+
+    /* Scrollbar estilizada */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    .modal {
+      display: none;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+    }
+    .modal.show { display: flex; }
   </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 theme-transition">
 
-  <div id="app" class="min-h-screen flex">
+<body class="min-h-screen text-slate-200">
 
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 hidden md:block">
-      <div class="flex items-center gap-3 px-2 mb-6">
-        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-lg">A</div>
-        <div>
-          <h1 class="text-lg font-bold">Admin — Tutorías</h1>
-          <p id="sidebar-rol" class="text-sm text-gray-500 dark:text-gray-300"></p>
+  <div class="flex h-screen overflow-hidden">
+
+    <aside class="w-80 glass-card m-4 rounded-3xl flex flex-col p-6 hidden lg:flex">
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="bg-sky-500 p-2.5 rounded-2xl shadow-lg shadow-sky-500/20">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          </div>
+          <h2 class="font-bold text-xl tracking-tight text-white">Tutorías<span class="text-sky-500">PRO</span></h2>
         </div>
+
+        <nav class="space-y-1">
+          <button data-target="sec-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium transition-all">
+            📊 Panel Principal
+          </button>
+          <button data-target="sec-usuarios" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all">
+            👥 Gestión Usuarios
+          </button>
+          <button data-target="sec-asignaciones" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-400 hover:bg-slate-800/50 hover:text-slate-100 transition-all">
+            🔗 Asignar Tutorados
+          </button>
+        </nav>
       </div>
 
-      <nav class="space-y-1 text-sm">
-        <a href="#/admin" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9.75L12 4l9 5.75V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.75z"/></svg>
-          <span>Dashboard</span>
-        </a>
-
-        <a href="#/tutorias" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span>Gestión de Tutorías</span>
-        </a>
-
-        <a href="#/reportes" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3v18h18M7 14l3 3 7-7" /></svg>
-          <span>Reportes</span>
-        </a>
-
-        <a href="#/usuarios" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11c1.657 0 3-1.567 3-3.5S17.657 4 16 4s-3 1.567-3 3.5S14.343 11 16 11zM8 11c1.657 0 3-1.567 3-3.5S9.657 4 8 4 5 5.567 5 7.5 6.343 11 8 11zM2 20a6 6 0 0 1 12 0"/></svg>
-          <span>Usuarios</span>
-        </a>
-
-        <a href="#/cronograma" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M3 11h18M5 21h14a2 2 0 0 0 2-2V8H3v11a2 2 0 0 0 2 2z"/></svg>
-          <span>Cronograma</span>
-        </a>
-
-        <a id="pdf-link" target="_blank" href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v6h6M7 21h10a2 2 0 0 0 2-2V7l-5-5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2z"/></svg>
-          <span>Documentación (PDF)</span>
-        </a>
-
-        <div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>
-
-        <a href="#/configuracion" class="nav-link flex items-center gap-3 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3"/></svg>
-          <span>Configuración</span>
-        </a>
-
-        <button id="logout-desktop" class="w-full text-left mt-4 p-2 text-sm rounded hover:bg-red-50 dark:hover:bg-red-700 flex items-center gap-3 text-red-600 dark:text-red-400">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8v8"/></svg>
-          Cerrar sesión
+      <div class="mt-auto pt-6 border-t border-slate-800">
+        <div class="flex items-center gap-3 p-3 mb-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 flex items-center justify-center font-bold text-white shadow-lg" id="avatar-letra">A</div>
+          <div class="overflow-hidden">
+            <p class="text-sm font-semibold text-white truncate" id="admin-nombre">Admin</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-tighter">Sesión de Administrador</p>
+          </div>
+        </div>
+        <button id="logout-btn" class="w-full py-3 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white font-semibold transition-all">
+          Cerrar Sesión
         </button>
-      </nav>
-
-      <div class="mt-6 text-xs text-gray-500 dark:text-gray-400">
-        Atajo: <span class="font-medium">R</span> — registrar tutoría
       </div>
     </aside>
 
-    <!-- MOBILE TOPBAR & CONTENT -->
-    <div class="flex-1 flex flex-col">
-      <!-- Mobile topbar -->
-      <header class="flex items-center justify-between bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 md:hidden">
-        <button id="btn-open-sidebar" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-
-        <div class="flex items-center gap-3">
-          <button id="btn-theme-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
-            <svg id="icon-theme-mobile" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
-          </button>
-
-          <div class="text-sm text-gray-700 dark:text-gray-200">
-            <div id="topbar-usuario" class="font-semibold">Administrador</div>
-            <div id="topbar-rol" class="text-xs text-gray-500 dark:text-gray-400"></div>
-          </div>
+    <main class="flex-1 overflow-y-auto p-8">
+      
+      <header class="flex justify-between items-end mb-10">
+        <div>
+          <h1 class="text-4xl font-bold text-white mb-2">Bienvenido, Administrador</h1>
+          <p class="text-slate-400">Resumen general de las tutorías en Ingeniería de Sistemas.</p>
+        </div>
+        <div class="text-right hidden sm:block">
+          <p class="text-sm text-slate-500" id="fecha-actual">Cargando fecha...</p>
         </div>
       </header>
 
-      <!-- Desktop topbar -->
-      <div class="hidden md:flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex items-center gap-4">
-          <h2 id="page-title" class="text-2xl font-bold">Dashboard</h2>
-          <span id="page-sub" class="text-sm text-gray-500 dark:text-gray-300">Resumen</span>
-        </div>
+      <section id="sec-dashboard" class="section space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-sky-500/20 rounded-2xl flex items-center justify-center text-sky-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Estudiantes</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-estudiantes">0</h3>
+          </div>
 
-        <div class="flex items-center gap-3">
-          <button id="btn-theme" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700" title="Cambiar tema">
-            <svg id="icon-theme" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"></svg>
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-indigo-500/20 rounded-2xl flex items-center justify-center text-indigo-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Tutores Activos</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-tutores">0</h3>
+          </div>
+
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Cronogramas</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-cronos">0</h3>
+          </div>
+
+          <div class="card-stat glass-card p-6 rounded-3xl">
+            <div class="w-12 h-12 bg-rose-500/20 rounded-2xl flex items-center justify-center text-rose-500 mb-4">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">Solicitudes</p>
+            <h3 class="text-4xl font-bold text-white mt-1" id="card-tutorias">0</h3>
+          </div>
+        </div>
+      </section>
+
+      <section id="sec-usuarios" class="section hidden">
+        <div class="glass-card rounded-3xl p-8">
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-8">
+            <h2 class="text-2xl font-bold text-white">Directorio de Usuarios</h2>
+            <button id="btn-nuevo-usuario" class="px-6 py-3 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-2xl shadow-lg shadow-sky-500/20 transition-all">
+              + Registrar Nuevo
+            </button>
+          </div>
+          <div id="lista-usuarios" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+        </div>
+      </section>
+
+      <section id="sec-asignaciones" class="section hidden">
+        <div class="glass-card rounded-3xl p-10 text-center max-w-2xl mx-auto">
+          <div class="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+          </div>
+          <h2 class="text-3xl font-bold text-white mb-4">Vincular Tutorado</h2>
+          <p class="text-slate-400 mb-8 text-lg">Asigna un tutor académico a un estudiante y define la materia de seguimiento.</p>
+          <button id="btn-asignar" class="px-10 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all uppercase tracking-widest">
+            Iniciar Nueva Asignación
           </button>
+        </div>
+      </section>
 
-          <div class="flex items-center gap-3">
-            <div class="text-right">
-              <div id="user-name-top" class="font-semibold">Administrador</div>
-              <div id="user-role-top" class="text-xs text-gray-500 dark:text-gray-400"></div>
-            </div>
-            <div>
-              <img id="avatar" src="" alt="avatar" class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
-            </div>
-          </div>
+    </main>
+  </div>
+
+  <div id="modal-asignar" class="modal fixed inset-0 items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md rounded-[2.5rem] p-10 relative border-sky-500/30">
+      <h2 class="text-2xl font-black text-white mb-8 text-center uppercase tracking-tighter">Nueva Vinculación</h2>
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Estudiante Seleccionado</label>
+          <select id="sel-alumnos" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Tutor Académico</label>
+          <select id="sel-tutores" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 outline-none transition-all"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-sky-400 uppercase mb-2 ml-1">Materia / Área</label>
+          <select id="sel-materias" class="w-full bg-slate-900/50 border border-slate-700 p-4 rounded-2xl focus:border-sky-500 outline-none transition-all"></select>
         </div>
       </div>
 
-      <!-- MAIN content -->
-      <main class="p-6">
-        <!-- DASHBOARD view -->
-        <section id="panel-admin" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías hoy</p>
-              <p id="count-today" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorías este mes</p>
-              <p id="count-month" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Usuarios</p>
-              <p id="count-users" class="text-2xl font-bold">0</p>
-            </div>
-
-            <div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
-              <p class="text-xs text-gray-500 dark:text-gray-400">Tutorados asignados</p>
-              <p id="count-students" class="text-2xl font-bold">0</p>
-            </div>
-          </div>
-
-          <!-- Quick create tutoria + recent -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-              <h3 class="text-lg font-semibold mb-3">Registrar Tutoría (rápida)</h3>
-              <form id="quick-form" class="space-y-3">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <input id="tf-student" type="text" placeholder="Nombre del estudiante" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" required />
-                  <select id="tf-type" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
-                    <option value="academica">Académica</option>
-                    <option value="personal">Personal</option>
-                    <option value="profesional">Profesional</option>
-                  </select>
-                </div>
-                <textarea id="tf-notes" rows="3" placeholder="Observaciones / notas" class="w-full p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent"></textarea>
-
-                <div class="flex items-center gap-3">
-                  <input id="tf-date" type="date" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-                  <button type="submit" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Registrar</button>
-                </div>
-              </form>
-            </div>
-
-            <aside class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-              <h4 class="font-semibold mb-3">Acciones recientes</h4>
-              <ul id="recent-actions" class="text-sm text-gray-600 dark:text-gray-300 space-y-2">
-                <li>No hay acciones recientes</li>
-              </ul>
-            </aside>
-          </div>
-
-          <!-- Tabla Usuarios (admin) -->
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold">Usuarios</h3>
-              <div class="flex items-center gap-2">
-                <button id="btn-add-user" class="bg-blue-600 text-white px-3 py-1 rounded">Nuevo Usuario</button>
-                <button id="btn-export-users" class="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">Exportar CSV</button>
-              </div>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
-                  <tr>
-                    <th class="px-3 py-2">#</th>
-                    <th class="px-3 py-2">Nombre</th>
-                    <th class="px-3 py-2">Correo</th>
-                    <th class="px-3 py-2">Rol</th>
-                    <th class="px-3 py-2">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="users-tbody" class="text-gray-700 dark:text-gray-200">
-                  <tr><td class="p-3" colspan="5">No hay usuarios. Crea uno con "Nuevo Usuario".</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </section>
-
-        <!-- GESTIÓN DE TUTORÍAS -->
-        <section id="panel-tutorias" class="hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Gestión de Tutorías</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-300">Lista de tutorías (demo local).</p>
-
-            <div class="overflow-x-auto mt-4">
-              <table class="w-full text-sm">
-                <thead class="text-left text-xs text-gray-500 dark:text-gray-300">
-                  <tr>
-                    <th class="px-3 py-2">Fecha</th>
-                    <th class="px-3 py-2">Estudiante</th>
-                    <th class="px-3 py-2">Tipo</th>
-                    <th class="px-3 py-2">Tutor</th>
-                    <th class="px-3 py-2">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="tutorias-tbody" class="text-gray-700 dark:text-gray-200">
-                  <tr><td class="p-3" colspan="5">No hay tutorías registradas.</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- REPORTES -->
-        <section id="panel-reportes" class="hidden space-y-6">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Reportes</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-300">Estadísticas y reportes (mock/demo).</p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div class="p-4 bg-white dark:bg-gray-900 rounded border border-gray-100 dark:border-gray-700">
-                <p class="text-xs text-gray-500">Tutorías por tipo (último mes)</p>
-                <p class="text-2xl font-bold mt-2">—</p>
-              </div>
-              <div class="p-4 bg-white dark:bg-gray-900 rounded border border-gray-100 dark:border-gray-700">
-                <p class="text-xs text-gray-500">Tutorías por tutor</p>
-                <p class="text-2xl font-bold mt-2">—</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- USUARIOS -->
-        <section id="panel-usuarios" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Administrar Usuarios</h3>
-            <form id="user-form" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <input id="u-name" placeholder="Nombre completo" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-              <input id="u-email" placeholder="Correo electrónico" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent" />
-              <select id="u-role" class="p-2 rounded border border-gray-200 dark:border-gray-700 bg-transparent">
-                <option value="administrador">administrador</option>
-                <option value="tutor">tutor</option>
-                <option value="verificador">verificador</option>
-              </select>
-              <div class="flex items-center gap-2">
-                <button id="btn-save-user" type="button" class="bg-green-600 text-white px-4 py-2 rounded">Guardar</button>
-                <button id="btn-clear-user" type="button" class="bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded">Limpiar</button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- CRONOGRAMA -->
-        <section id="panel-cronograma" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-xl font-semibold mb-3">Cronograma</h3>
-            <div class="p-6 border rounded border-dashed border-gray-200 dark:border-gray-700 text-center text-sm">
-              Calendario / Cronograma (vista demo — integrar backend)
-            </div>
-          </div>
-        </section>
-
-        <!-- CONFIGURACIÓN -->
-        <section id="panel-configuracion" class="hidden">
-          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold mb-3">Configuración</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Tema</p>
-                <div class="flex items-center gap-3">
-                  <button id="btn-theme-settings" class="px-3 py-2 rounded border">Alternar tema</button>
-                  <span id="theme-status" class="text-sm text-gray-600 dark:text-gray-300"></span>
-                </div>
-              </div>
-              <div class="p-4 border rounded border-gray-200 dark:border-gray-700">
-                <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">Información</p>
-                <div class="text-sm">
-                  <p><strong id="profile-name">Administrador</strong></p>
-                  <p id="profile-role" class="text-gray-500 dark:text-gray-300">Rol</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- MOBILE SIDEBAR OVERLAY -->
-  <div id="mobile-sidebar" class="fixed inset-0 z-40 bg-black/40 hidden">
-    <div class="w-72 bg-white dark:bg-gray-800 h-full p-4">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded bg-blue-600 flex items-center justify-center text-white">A</div>
-          <div>
-            <div id="m-name" class="font-semibold">Administrador</div>
-            <div id="m-role" class="text-xs text-gray-500 dark:text-gray-300">Rol</div>
-          </div>
-        </div>
-        <button id="btn-close-mobile" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">
-          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
+      <div class="flex flex-col gap-3 mt-10">
+        <button id="asignar-btn" class="w-full py-4 bg-sky-500 text-white font-bold rounded-2xl shadow-lg hover:bg-sky-400 transition-all">Confirmar Asignación</button>
+        <button class="btn-cancelar w-full py-4 bg-slate-800 text-slate-400 font-semibold rounded-2xl hover:bg-slate-700 transition-all">Descartar</button>
       </div>
-
-      <nav class="flex flex-col gap-2">
-        <a href="#/admin" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
-        <a href="#/tutorias" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Gestión de Tutorías</a>
-        <a href="#/reportes" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Reportes</a>
-        <a href="#/usuarios" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Usuarios</a>
-        <a href="#/cronograma" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Cronograma</a>
-        <a href="sandbox:/mnt/data/Proyecto semestral 2025-2.pdf" target="_blank" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700">Documentación</a>
-      </nav>
     </div>
   </div>
 
-  <!-- SCRIPTS -->
   <script>
-    // ---------- Routes mapping ----------
-    const sections = {
-      '/admin': document.getElementById('panel-admin'),
-      '/tutorias': document.getElementById('panel-tutorias'),
-      '/reportes': document.getElementById('panel-reportes'),
-      '/usuarios': document.getElementById('panel-usuarios'),
-      '/cronograma': document.getElementById('panel-cronograma'),
-      '/configuracion': document.getElementById('panel-configuracion')
+    const API = "/api/admin";
+
+    // Manejo de Tabs
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const sections = document.querySelectorAll(".section");
+
+    tabBtns.forEach(btn => {
+      btn.onclick = () => {
+        const target = btn.dataset.target;
+        sections.forEach(s => s.classList.add("hidden"));
+        document.getElementById(target).classList.remove("hidden");
+        
+        tabBtns.forEach(b => {
+          b.classList.remove("bg-sky-500/10", "text-sky-400", "border-sky-500/20");
+          b.classList.add("text-slate-400");
+        });
+        btn.classList.add("bg-sky-500/10", "text-sky-400", "border-sky-500/20");
+      };
+    });
+
+    // Helper API
+    async function fetchJSON(u, o = {}) {
+      try {
+        const r = await fetch(u, o);
+        return r.json();
+      } catch (e) { console.error("Error API:", e); }
+    }
+
+    async function cargarResumen() {
+      const d = await fetchJSON(`${API}/resumen`);
+      if(!d) return;
+      document.getElementById("card-estudiantes").innerText = d.estudiantes;
+      document.getElementById("card-tutores").innerText = d.tutores;
+      document.getElementById("card-cronos").innerText = d.cronogramas;
+      document.getElementById("card-tutorias").innerText = d.tutorias;
+    }
+
+    async function cargarUsuarios() {
+      const d = await fetchJSON(`${API}/usuarios`);
+      const cont = document.getElementById("lista-usuarios");
+      cont.innerHTML = d.usuarios.map(u => `
+        <div class="glass-card p-5 rounded-2xl flex items-center gap-4 hover:border-sky-500/30 transition-all">
+          <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center font-bold text-sky-500">${u.nombre[0]}</div>
+          <div>
+            <h4 class="text-white font-semibold">${u.nombre} ${u.apellido}</h4>
+            <p class="text-xs text-slate-500">${u.email}</p>
+            <span class="text-[10px] px-2 py-0.5 bg-slate-800 border border-slate-700 rounded-full text-slate-400 mt-1 inline-block uppercase">${u.nombre_rol}</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Modal Asignar
+    const modalAsignar = document.getElementById("modal-asignar");
+    document.getElementById("btn-asignar").onclick = async () => {
+      modalAsignar.classList.add("show");
+      const [a, t, m] = await Promise.all([
+        fetchJSON(`${API}/alumnos/disponibles`),
+        fetchJSON(`${API}/tutores/disponibles`),
+        fetchJSON(`${API}/materias`)
+      ]);
+      document.getElementById("sel-alumnos").innerHTML = a.map(x => `<option value="${x.id_alumno}">${x.nombre}</option>`).join("");
+      document.getElementById("sel-tutores").innerHTML = t.map(x => `<option value="${x.id_tutor}">${x.nombre}</option>`).join("");
+      document.getElementById("sel-materias").innerHTML = m.map(x => `<option value="${x.id_materia}">${x.nombre_materia}</option>`).join("");
     };
 
-    function showRoute(route) {
-      const r = route || '/admin';
-      Object.values(sections).forEach(s => s && s.classList.add('hidden'));
-      if (sections[r]) sections[r].classList.remove('hidden');
+    document.querySelectorAll(".btn-cancelar").forEach(b => {
+      b.onclick = () => b.closest(".modal").classList.remove("show");
+    });
 
-      const titleMap = {
-        '/admin': ['Dashboard','Resumen'],
-        '/tutorias': ['Gestión de Tutorías','Ver y administrar tutorías'],
-        '/reportes': ['Reportes','Estadísticas'],
-        '/usuarios': ['Usuarios','Administración de usuarios'],
-        '/cronograma': ['Cronograma','Fechas programadas'],
-        '/configuracion': ['Configuración','Preferencias']
+    document.getElementById("asignar-btn").onclick = async () => {
+      const payload = {
+        id_alumno: Number(document.getElementById("sel-alumnos").value),
+        id_tutor: Number(document.getElementById("sel-tutores").value),
+        id_materia: Number(document.getElementById("sel-materias").value)
       };
-      const t = titleMap[r] || ['Panel',''];
-      document.getElementById('page-title').textContent = t[0];
-      document.getElementById('page-sub').textContent = t[1];
-
-      document.querySelectorAll('.nav-link').forEach(a => {
-        a.classList.remove('bg-gray-100','dark:bg-gray-700','font-semibold');
-        const href = a.getAttribute('href') || '';
-        if (href.endsWith(r)) a.classList.add('bg-gray-100','dark:bg-gray-700','font-semibold');
+      const r = await fetchJSON(`${API}/asignar`, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
       });
+      alert(r.message);
+      modalAsignar.classList.remove("show");
+      cargarResumen();
+    };
+
+    // Logout y Login Data
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if(user) {
+      document.getElementById("admin-nombre").innerText = user.nombre;
+      document.getElementById("avatar-letra").innerText = user.nombre[0];
     }
+    document.getElementById("fecha-actual").innerText = new Intl.DateTimeFormat('es-PE', { dateStyle: 'full' }).format(new Date());
 
-    function onHashChange() {
-      const hash = location.hash.replace('#', '') || '/admin';
-      showRoute(hash);
-    }
-    window.addEventListener('hashchange', onHashChange);
-    onHashChange();
+    cargarResumen();
+    cargarUsuarios();
+  /* ---------------- CERRAR SESIÓN ---------------- */
+  const btnLogout = document.getElementById("logout-btn");
 
-    // Mobile sidebar toggle
-    const mobileSidebar = document.getElementById('mobile-sidebar');
-    document.getElementById('btn-open-sidebar').addEventListener('click', () => mobileSidebar.classList.remove('hidden'));
-    document.getElementById('btn-close-mobile').addEventListener('click', () => mobileSidebar.classList.add('hidden'));
-    mobileSidebar.addEventListener('click', (e) => { if (e.target === mobileSidebar) mobileSidebar.classList.add('hidden'); });
-
-    // Desktop logout
-    document.getElementById('logout-desktop').addEventListener('click', () => { localStorage.removeItem('userData'); window.location.href = '/'; });
-
-    // ---------- Theme (dark mode) ----------
-    const themeKey = 'admin_theme';
-    function setTheme(dark) {
-      if (dark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
-      document.getElementById('theme-status').textContent = dark ? 'Oscuro' : 'Claro';
-      updateThemeIcons(dark);
-      localStorage.setItem(themeKey, dark ? 'dark' : 'light');
-    }
-    function updateThemeIcons(isDark) {
-      const darkSvg = '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
-      const lightSvg = '<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m12.728 0l-1.414-1.414M7.05 7.05L5.636 5.636"/>';
-      document.getElementById('icon-theme').innerHTML = isDark ? darkSvg : lightSvg;
-      document.getElementById('icon-theme-mobile').innerHTML = isDark ? darkSvg : lightSvg;
-    }
-    const savedTheme = localStorage.getItem(themeKey);
-    if (savedTheme) setTheme(savedTheme === 'dark'); else setTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    document.getElementById('btn-theme').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-    document.getElementById('btn-theme-mobile').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-    document.getElementById('btn-theme-settings').addEventListener('click', () => setTheme(!document.documentElement.classList.contains('dark')));
-
-
-     // ---------- User data and avatar ----------
-    // ---------- User data and avatar ----------
-    const user = JSON.parse(localStorage.getItem('userData')) || { id: 'Admin', rol: 'administrador' };
-    document.getElementById('sidebar-rol').textContent = user.rol || '';
-    document.getElementById('user-name-top').textContent = user.id || 'Admin';
-    document.getElementById('user-role-top').textContent = user.rol || '';
-    document.getElementById('topbar-usuario').textContent = user.id || 'Admin';
-    document.getElementById('topbar-rol').textContent = user.rol || '';
-    document.getElementById('m-name').textContent = user.id || 'Admin';
-    document.getElementById('m-role').textContent = user.rol || 'administrador';
-    document.getElementById('profile-name').textContent = user.id || 'Admin';
-    document.getElementById('profile-role').textContent = user.rol || 'administrador';
-
-    const avatar = document.getElementById('avatar');
-    const initials = (user.id || 'A').split(' ').map(s => s[0]).splice(0,2).join('').toUpperCase();
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><rect width='100%' height='100%' fill='${document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'}'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='36' fill='${document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#111827'}' font-family='Arial'>${initials}</text></svg>`;
-    avatar.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-
-    // ---------- Demo persistence (localStorage) ----------
-    const studentsKey = 'admin_students_demo';
-    const tutKey = 'admin_tutorias_demo';
-    const usersKey = 'admin_users_demo';
-
-    function saveStudent(s){ const arr = JSON.parse(localStorage.getItem(studentsKey)||'[]'); arr.push(s); localStorage.setItem(studentsKey, JSON.stringify(arr)); renderStudents(); }
-    function saveTutoria(t){ const arr = JSON.parse(localStorage.getItem(tutKey)||'[]'); arr.push(t); localStorage.setItem(tutKey, JSON.stringify(arr)); renderTutorias(); }
-    function saveUser(u){ const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); arr.push(u); localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); }
-
-    // Quick form
-    document.getElementById('quick-form').addEventListener('submit', (e)=>{
+  if (btnLogout) {
+    btnLogout.onclick = (e) => {
       e.preventDefault();
-      const student = document.getElementById('tf-student').value.trim();
-      if(!student) return alert('Ingrese nombre del estudiante');
-      const type = document.getElementById('tf-type').value;
-      const notes = document.getElementById('tf-notes').value;
-      const date = document.getElementById('tf-date').value || new Date().toISOString().slice(0,10);
-      saveStudent({name: student, code: '—', carrera: '—', last: date});
-      saveTutoria({date, student, type, tutor: user.id, notes});
-      document.getElementById('recent-actions').innerHTML = `<li class="text-sm">${new Date().toLocaleString()}: Registro rápido <strong>${student}</strong></li>` + document.getElementById('recent-actions').innerHTML;
-      document.getElementById('quick-form').reset();
-      refreshCounts();
-    });
-
-    // User form
-    document.getElementById('btn-save-user').addEventListener('click', () => {
-      const n = document.getElementById('u-name').value.trim();
-      const em = document.getElementById('u-email').value.trim();
-      const r = document.getElementById('u-role').value;
-      if(!n||!em) return alert('Complete nombre y correo');
-      saveUser({name: n, email: em, role: r});
-      document.getElementById('user-form').reset();
-      alert('Usuario guardado (demo).');
-      refreshCounts();
-    });
-    document.getElementById('btn-clear-user').addEventListener('click', () => document.getElementById('user-form').reset());
-
-    // New user button opens users panel
-    document.getElementById('btn-add-user').addEventListener('click', ()=> location.hash = '/usuarios');
-
-    // Export users CSV
-    document.getElementById('btn-export-users').addEventListener('click', ()=>{
-      const arr = JSON.parse(localStorage.getItem(usersKey)||'[]');
-      if(!arr.length) return alert('No hay usuarios para exportar.');
-      const csv = ['Nombre,Correo,Rol', ...arr.map(u=>`"${u.name}","${u.email}","${u.role}"`)].join('\n');
-      const blob = new Blob([csv], {type: 'text/csv'}); const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'usuarios.csv'; a.click(); URL.revokeObjectURL(url);
-    });
-
-    // Render functions
-    function renderUsers(){
-      const arr = JSON.parse(localStorage.getItem(usersKey)||'[]');
-      const tbody = document.getElementById('users-tbody');
-      document.getElementById('count-users').textContent = arr.length;
-      if(!arr.length){ tbody.innerHTML = '<tr><td class="p-3" colspan="5">No hay usuarios. Crea uno con "Nuevo Usuario".</td></tr>'; return; }
-      tbody.innerHTML = arr.map((u,i) => `
-        <tr class="border-t border-gray-100 dark:border-gray-700">
-          <td class="px-3 py-2">${i+1}</td>
-          <td class="px-3 py-2">${u.name}</td>
-          <td class="px-3 py-2">${u.email}</td>
-          <td class="px-3 py-2">${u.role}</td>
-          <td class="px-3 py-2">
-            <button class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700" data-index="${i}" onclick="editUser(event)">Editar</button>
-            <button class="text-xs px-2 py-1 rounded bg-red-50 dark:bg-red-700/30" data-index="${i}" onclick="removeUser(event)">Eliminar</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-    window.editUser = function(e){
-      const i = +e.target.getAttribute('data-index'); const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); const u = arr[i];
-      if(!u) return; const newName = prompt('Editar nombre', u.name); if(newName){ u.name = newName; arr[i]=u; localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); }
-    }
-    window.removeUser = function(e){ const i = +e.target.getAttribute('data-index'); const arr = JSON.parse(localStorage.getItem(usersKey)||'[]'); if(!confirm('Eliminar usuario?')) return; arr.splice(i,1); localStorage.setItem(usersKey, JSON.stringify(arr)); renderUsers(); refreshCounts(); }
-
-    function renderStudents(){
-      const arr = JSON.parse(localStorage.getItem(studentsKey)||'[]');
-      document.getElementById('count-students').textContent = arr.length;
-    }
-
-    function renderTutorias(){
-      const arr = JSON.parse(localStorage.getItem(tutKey)||'[]').slice().reverse();
-      const tbody = document.getElementById('tutorias-tbody');
-      document.getElementById('count-month').textContent = arr.length;
-      if(!arr.length){ tbody.innerHTML = '<tr><td class="p-3" colspan="5">No hay tutorías registradas.</td></tr>'; return; }
-      tbody.innerHTML = arr.map(t => `
-        <tr class="border-t border-gray-100 dark:border-gray-700">
-          <td class="px-3 py-2">${new Date(t.date).toLocaleString()}</td>
-          <td class="px-3 py-2">${t.student}</td>
-          <td class="px-3 py-2">${t.type}</td>
-          <td class="px-3 py-2">${t.tutor || '—'}</td>
-          <td class="px-3 py-2">
-            <button class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700" onclick="viewTutoria('${encodeURIComponent(JSON.stringify(t))}')">Ver</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-    window.viewTutoria = function(encoded){ const t = JSON.parse(decodeURIComponent(encoded)); alert('Tutoría:\\n' + JSON.stringify(t,null,2)); }
-
-    // Refresh counters
-    function refreshCounts(){ const users = JSON.parse(localStorage.getItem(usersKey)||'[]').length; const students = JSON.parse(localStorage.getItem(studentsKey)||'[]').length; const tut = JSON.parse(localStorage.getItem(tutKey)||'[]').length; document.getElementById('count-users').textContent = users; document.getElementById('count-students').textContent = students; document.getElementById('count-month').textContent = tut; document.getElementById('count-today').textContent = 0; }
-
-    // Search and filter (example for tutorias)
-    // Export and other features could call backend endpoints when available.
-
-    // Init: render persisted demo data
-    renderUsers(); renderStudents(); renderTutorias(); refreshCounts();
-
-    // Keyboard shortcut R to focus quick-student
-    window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'r' && !(e.ctrlKey||e.metaKey)) { document.getElementById('tf-student').focus(); } });
-
-    // Logout (top-right button)
-    document.getElementById('logout-desktop').addEventListener('click', () => { localStorage.removeItem('userData'); window.location.href = '/'; });
-
-    // Ensure PDF link points to your uploaded file (local path)
-    document.getElementById('pdf-link').href = 'sandbox:/mnt/data/Proyecto semestral 2025-2.pdf';
-
+      // 1. Limpiamos los datos del usuario del navegador
+      localStorage.removeItem("userData");
+      // 2. Redirigimos al login (página principal)
+      window.location.href = "/";
+    };
+  }
   </script>
 </body>
 </html>

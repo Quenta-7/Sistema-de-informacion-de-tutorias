@@ -1,46 +1,63 @@
-# backend/models/user_model.py
-
 import psycopg2
+import bcrypt
 from config import Config
-# FUNCIÓN 1: get_db_connection() DEBE ESTAR DEFINIDA AQUÍ
-def get_db_connection():
-    """Establece y retorna una conexión a la base de datos PostgreSQL."""
-    conn = None
+
+def get_connection():
+    return psycopg2.connect(
+        host=Config.DB_HOST,
+        database=Config.DB_NAME,
+        user=Config.DB_USER,
+        password=Config.DB_PASSWORD,
+        port=Config.DB_PORT
+    )
+
+def verify_user_login(email, password):
     try:
-        conn = psycopg2.connect(
-            host=Config.DB_HOST,
-            database=Config.DB_NAME,
-            user=Config.DB_USER,
-            password=Config.DB_PASSWORD,
-            port=Config.DB_PORT
-        )
-        return conn
-    except psycopg2.Error as e:
-        print(f"Error al conectar a la base de datos: {e}")
+        conn = get_connection()
+        cur = conn.cursor()
+
+        sql = """
+            SELECT 
+                id_usuario,
+                id_rol,
+                nombre,
+                apellido,
+                email,
+                password_hash
+            FROM usuarios
+            WHERE email = %s
+            LIMIT 1;
+        """
+
+        cur.execute(sql, (email,))
+        user = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if not user:
+            return None  # usuario no encontrado
+
+        id_usuario, id_rol, nombre, apellido, correo, password_hash = user
+
+        # Convertir si viene como string
+        if isinstance(password_hash, str):
+            password_hash = password_hash.encode("utf-8")
+
+        # Comparar contraseñas
+        if not bcrypt.checkpw(password.encode("utf-8"), password_hash):
+            return None
+
+        # Login OK
+        return {
+            "id_usuario": id_usuario,
+            "id_rol": id_rol,
+            "nombre": nombre,
+            "apellido": apellido,
+            "email": correo
+        }
+
+
+    except Exception as e:
+        print("Error al verificar usuario:", e)
         return None
-def verify_user_login(tutor_id, password):
-    """Verifica si las credenciales de un usuario son válidas."""
-    conn = get_db_connection()
-    user = None
-    
-    if conn:
-        try:
-            cursor = conn.cursor()
-            # Esta línea es un comentario explicativo y puede quedarse con el '#'
-            # Asumiendo que el campo para el login es 'tutor_id' y 'descripcion'
-            
-            # Estas dos líneas deben estar indentadas dentro del bloque try:
-            query = "SELECT id, rol FROM usuarios WHERE id = %s AND contrasena = %s" 
-            cursor.execute(query, (tutor_id, password))
-            
-            result = cursor.fetchone()
-            if result:
-                user = {"id": result[0], "rol": result[1]}
-            
-            cursor.close()
-        except Exception as e:
-            print(f"Error al verificar usuario: {e}")
-        finally:
-            conn.close()
-            
-    return user

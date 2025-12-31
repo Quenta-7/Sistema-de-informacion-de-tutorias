@@ -7,108 +7,347 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-950 min-h-screen text-white">
 
-  <!-- ==== LAYOUT GENERAL ==== -->
   <div class="flex min-h-screen">
 
-    <!-- ========================================================= -->
-    <!-- =================== SIDEBAR IZQUIERDO =================== -->
-    <!-- ========================================================= -->
-    <aside class="w-64 bg-white shadow-md p-4 space-y-4">
-      <div class="flex items-center space-x-2">
-        <div class="bg-purple-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-xl font-bold">
+    <!-- ================== SIDEBAR ================== -->
+    <aside class="w-64 bg-gradient-to-b from-sky-900/90 to-slate-950/90 border-r border-white/10 p-6 flex flex-col">
+      <!-- Perfil -->
+      <div class="flex items-center space-x-3 mb-8">
+        <div id="student-initials"
+             class="w-12 h-12 rounded-full bg-sky-500 flex items-center justify-center text-xl font-bold">
           E
         </div>
         <div>
-          <p class="text-sm text-gray-500">Panel del Estudiante</p>
-          <p class="text-gray-800 font-semibold" id="sidebar-username">Estudiante</p>
+          <p id="student-name" class="font-semibold text-white">Estudiante</p>
+          <p id="student-role" class="text-xs text-sky-200 uppercase tracking-wide">ESTUDIANTE</p>
         </div>
       </div>
 
-      <nav class="pt-4 space-y-2">
-        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Dashboard</a>
-        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Mi Tutor</a>
-        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Horario</a>
-        <a href="#" class="block px-3 py-2 rounded hover:bg-purple-100 text-gray-700 font-medium">Retroalimentación</a>
-
-        <hr class="my-4">
-
-        <button id="logout" class="w-full text-left px-3 py-2 rounded bg-red-500 text-white hover:bg-red-600">
-          Cerrar sesión
+      <!-- Menú -->
+      <nav class="flex-1 space-y-2 text-sm">
+        <button data-section="dashboard"
+                class="nav-btn w-full text-left px-3 py-2 rounded-lg bg-sky-600 text-white font-medium">
+          Dashboard
+        </button>
+        <button data-section="tutor"
+                class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-sky-900/60 font-medium text-sky-100">
+          Mi Tutor
+        </button>
+        <button data-section="horario"
+                class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-sky-900/60 font-medium text-sky-100">
+          Mi Horario
+        </button>
+        <button data-section="retro"
+                class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-sky-900/60 font-medium text-sky-100">
+          Retroalimentaciones
         </button>
       </nav>
+
+      <!-- Logout -->
+      <button id="logout"
+              class="mt-6 w-full px-3 py-2 rounded-lg bg-red-500 text-sm font-semibold hover:bg-red-600">
+        Cerrar sesión
+      </button>
     </aside>
 
-    <!-- ========================================================= -->
-    <!-- =================== CONTENIDO PRINCIPAL ================= -->
-    <!-- ========================================================= -->
-    <main class="flex-1 p-8">
+    <!-- ================== MAIN ================== -->
+    <main class="flex-1 bg-gradient-to-br from-slate-950 via-slate-900 to-sky-900 p-8">
 
-      <h1 class="text-3xl font-bold text-gray-700">Dashboard</h1>
-      <p class="text-gray-500 mt-1">Resumen rápido</p>
+      <!-- HEADER -->
+      <header>
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight">
+          Dashboard del Estudiante
+        </h1>
+        <p class="text-sky-200 mt-1 text-sm">
+          Bienvenido a tu panel académico
+        </p>
+      </header>
 
-      <!-- === TARJETAS PRINCIPALES === -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <!-- ========= SECCIÓN DASHBOARD (RESUMEN) ========= -->
+      <section id="section-dashboard" class="mt-8 space-y-8">
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <p class="text-gray-500">Tutor Asignado</p>
-          <p id="tutor-asignado" class="text-3xl font-bold mt-2">—</p>
+        <!-- Tarjetas principales -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Tutor asignado -->
+          <article
+            class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm flex flex-col justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-sky-200">Tutor asignado</p>
+              <p id="card-tutor-nombre" class="mt-3 text-2xl font-semibold">—</p>
+            </div>
+          </article>
+
+          <!-- Próxima tutoría -->
+          <article
+            class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm flex flex-col justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-sky-200">Próxima tutoría</p>
+              <p id="card-tutoria-fecha" class="mt-3 text-xl font-semibold leading-tight">—</p>
+              <p id="card-tutoria-hora" class="text-sm text-sky-200 mt-1"></p>
+            </div>
+          </article>
+
+          <!-- Contador de retroalimentaciones -->
+          <article
+            class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm flex flex-col justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-sky-200">Retroalimentaciones</p>
+              <p id="card-retro-count" class="mt-3 text-4xl font-bold">0</p>
+            </div>
+          </article>
         </div>
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <p class="text-gray-500">Próxima Tutoría</p>
-          <p id="proxima-tutoria" class="text-3xl font-bold mt-2">—</p>
+        <!-- Bloques detalles -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Info tutor -->
+          <article class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm">
+            <h2 class="text-lg font-semibold mb-3">Información del Tutor</h2>
+            <div id="info-tutor" class="text-sm text-sky-100">
+              Cargando...
+            </div>
+          </article>
+
+          <!-- Horario -->
+          <article class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm">
+            <h2 class="text-lg font-semibold mb-3">Horario de Tutorías</h2>
+            <div id="info-horario" class="text-sm text-sky-100">
+              Cargando...
+            </div>
+          </article>
         </div>
+      </section>
 
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <p class="text-gray-500">Retroalimentaciones enviadas</p>
-          <p id="cantidad-feedback" class="text-3xl font-bold mt-2">0</p>
+      <!-- ========= SECCIÓN MI TUTOR ========= -->
+      <section id="section-tutor" class="hidden mt-8">
+        <h2 class="text-2xl font-semibold mb-4">Mi Tutor</h2>
+        <div class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm">
+          <div id="tutor-detalle" class="text-sm text-sky-100">
+            Cargando...
+          </div>
         </div>
+      </section>
 
-      </div>
-
-      <!-- === BLOQUE DETALLADO === -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
-
-        <!-- ---- SECCIÓN TUTOR ASIGNADO ---- -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-lg font-semibold text-gray-700 mb-3">Información del Tutor</h2>
-          <p id="info-tutor" class="text-gray-600">
-            No tienes tutor asignado actualmente.
-          </p>
+      <!-- ========= SECCIÓN HORARIO ========= -->
+      <section id="section-horario" class="hidden mt-8">
+        <h2 class="text-2xl font-semibold mb-4">Mi Horario de Tutorías</h2>
+        <div class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm">
+          <div id="horario-detalle" class="text-sm text-sky-100">
+            Cargando...
+          </div>
         </div>
+      </section>
 
-        <!-- ---- SECCIÓN HORARIO ---- -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-lg font-semibold text-gray-700 mb-3">Horario de Tutorías</h2>
-          <p id="info-horario" class="text-gray-600">
-            No hay horarios registrados.
-          </p>
+      <!-- ========= SECCIÓN RETRO ========= -->
+      <section id="section-retro" class="hidden mt-8">
+        <h2 class="text-2xl font-semibold mb-4">Retroalimentaciones Recibidas</h2>
+        <div class="rounded-2xl bg-white/5 border border-white/10 shadow-lg p-6 backdrop-blur-sm">
+          <div id="retro-detalle" class="text-sm text-sky-100 space-y-3">
+            Cargando...
+          </div>
         </div>
-
-      </div>
+      </section>
 
     </main>
-
   </div>
 
-  <!-- ========================================================= -->
-  <!-- ======================== SCRIPT ========================= -->
-  <!-- ========================================================= -->
+  <!-- ================== SCRIPT ================== -->
   <script>
-    const user = JSON.parse(localStorage.getItem('userData'));
+    // ================== AUTENTICACIÓN BÁSICA ==================
+    const user = JSON.parse(localStorage.getItem("userData"));
 
-    if (!user) {
-      window.location.href = '/';
-    } else {
-      document.getElementById('sidebar-username').textContent = user.id;
+    if (!user || user.rol !== 3) { // 3 = Alumno
+      window.location.href = "/";
     }
 
-    document.getElementById('logout').addEventListener('click', () => {
-      localStorage.removeItem('userData');
-      window.location.href = '/';
+    const fullName = (user.nombre ? (user.nombre + " " + (user.apellido || "")) : "Estudiante").trim();
+    document.getElementById("student-name").textContent = fullName;
+    document.getElementById("student-role").textContent = "ESTUDIANTE";
+    document.getElementById("student-initials").textContent = fullName.charAt(0) || "E";
+
+    document.getElementById("logout").addEventListener("click", () => {
+      localStorage.removeItem("userData");
+      localStorage.removeItem("token");
+      window.location.href = "/";
     });
+
+    // ================== NAVEGACIÓN DE SECCIONES ==================
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const sections = {
+      dashboard: document.getElementById("section-dashboard"),
+      tutor: document.getElementById("section-tutor"),
+      horario: document.getElementById("section-horario"),
+      retro: document.getElementById("section-retro"),
+    };
+
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-section");
+        Object.values(sections).forEach(sec => sec.classList.add("hidden"));
+        sections[target].classList.remove("hidden");
+
+        navButtons.forEach(b => {
+          b.classList.remove("bg-sky-600", "text-white");
+          b.classList.add("bg-transparent", "text-sky-100");
+        });
+        btn.classList.add("bg-sky-600", "text-white");
+      });
+    });
+
+    // ================== HELPERS ==================
+    const BASE_API = window.location.origin + "/api/estudiante";
+
+    async function safeFetchJson(url) {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+
+        try {
+          const data = JSON.parse(text);
+          if (!res.ok) {
+            console.error("Error en respuesta:", data);
+            return null;
+          }
+          return data;
+        } catch (e) {
+          console.error("La respuesta no es JSON válido:", text);
+          return null;
+        }
+      } catch (err) {
+        console.error("Error de conexión:", err);
+        return null;
+      }
+    }
+
+    function formatearFechaHora(iso) {
+      if (!iso) return { fecha: "—", hora: "" };
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return { fecha: "—", hora: "" };
+
+      const fecha = d.toLocaleDateString("es-PE", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+      const hora = d.toLocaleTimeString("es-PE", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+      return { fecha, hora };
+    }
+
+    // ================== CARGA DE DATOS ==================
+
+    // --- Tutor ---
+    async function cargarTutor() {
+      const data = await safeFetchJson(`${BASE_API}/tutor/${user.id}`);
+      const cardNombre = document.getElementById("card-tutor-nombre");
+      const infoTutor = document.getElementById("info-tutor");
+      const tutorDetalle = document.getElementById("tutor-detalle");
+
+      if (!data || !data.tutor) {
+        cardNombre.textContent = "Sin tutor asignado";
+        infoTutor.textContent = "No tienes un tutor asignado actualmente.";
+        tutorDetalle.textContent = "No tienes un tutor asignado en el sistema.";
+        return;
+      }
+
+      const t = data.tutor;
+      const nombreTutor = `${t.nombre || ""} ${t.apellido || ""}`.trim() || "Tutor";
+
+      cardNombre.textContent = nombreTutor;
+
+      infoTutor.innerHTML = `
+        <p><span class="font-semibold">Docente:</span> ${nombreTutor}</p>
+        <p><span class="font-semibold">Correo:</span> ${t.email || "—"}</p>
+        <p><span class="font-semibold">Departamento:</span> ${t.departamento || "—"}</p>
+      `;
+
+      tutorDetalle.innerHTML = `
+        <p class="mb-1"><span class="font-semibold">Docente:</span> ${nombreTutor}</p>
+        <p class="mb-1"><span class="font-semibold">Correo institucional:</span> ${t.email || "—"}</p>
+        <p class="mb-1"><span class="font-semibold">Departamento:</span> ${t.departamento || "—"}</p>
+      `;
+    }
+
+    // --- Horario ---
+    async function cargarHorario() {
+      const data = await safeFetchJson(`${BASE_API}/horario/${user.id}`);
+      const infoHorario = document.getElementById("info-horario");
+      const horarioDetalle = document.getElementById("horario-detalle");
+      const cardFecha = document.getElementById("card-tutoria-fecha");
+      const cardHora = document.getElementById("card-tutoria-hora");
+
+      const lista = Array.isArray(data && data.horario) ? data.horario : [];
+
+      if (!lista.length) {
+        infoHorario.textContent = "No hay horarios registrados.";
+        horarioDetalle.textContent = "Aún no tienes horarios de tutoría registrados.";
+        cardFecha.textContent = "—";
+        cardHora.textContent = "";
+        return;
+      }
+
+      // Ordenar por fecha (fecha_tutoria o fecha_inicio)
+      lista.sort((a, b) => {
+        const fa = new Date(a.fecha_tutoria || a.fecha_inicio || a.fecha);
+        const fb = new Date(b.fecha_tutoria || b.fecha_inicio || b.fecha);
+        return fa - fb;
+      });
+
+      const proxima = lista[0];
+      const fechaRaw = proxima.fecha_tutoria || proxima.fecha_inicio || proxima.fecha;
+      const { fecha, hora } = formatearFechaHora(fechaRaw);
+      cardFecha.textContent = fecha;
+      cardHora.textContent = hora ? `Hora: ${hora}` : "";
+
+      // Mostrar lista
+      infoHorario.innerHTML = lista.map(h => {
+        const fh = formatearFechaHora(h.fecha_tutoria || h.fecha_inicio || h.fecha);
+        return `
+          <p class="mb-1">
+            <span class="font-semibold">${fh.fecha}</span>
+            ${fh.hora ? ` · ${fh.hora}` : ""}
+            ${h.ambiente ? ` · Ambiente: ${h.ambiente}` : ""}
+          </p>
+        `;
+      }).join("");
+
+      horarioDetalle.innerHTML = infoHorario.innerHTML;
+    }
+
+    // --- Retroalimentaciones ---
+    async function cargarRetro() {
+      const data = await safeFetchJson(`${BASE_API}/retro/${user.id}`);
+      const lista = Array.isArray(data && data.retroalimentaciones) ? data.retroalimentaciones : [];
+      const cardCount = document.getElementById("card-retro-count");
+      const retroDetalle = document.getElementById("retro-detalle");
+
+      cardCount.textContent = lista.length.toString();
+
+      if (!lista.length) {
+        retroDetalle.textContent = "Aún no tienes retroalimentaciones registradas.";
+        return;
+      }
+
+      retroDetalle.innerHTML = lista.map(r => {
+        const fh = formatearFechaHora(r.fecha || r.fecha_tutoria);
+        return `
+          <div class="border border-white/10 rounded-xl p-3 bg-slate-900/60">
+            <p class="text-xs text-sky-300 mb-1">${fh.fecha} ${fh.hora ? "· " + fh.hora : ""}</p>
+            <p class="text-sm">${r.comentario || r.observaciones || "Sin texto"}</p>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Cargar todo al inicio
+    cargarTutor();
+    cargarHorario();
+    cargarRetro();
   </script>
 
 </body>

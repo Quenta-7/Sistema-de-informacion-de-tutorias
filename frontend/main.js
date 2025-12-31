@@ -1,102 +1,98 @@
-// ============================
-// FRONTEND - Login Script
-// ============================
-// Este script maneja el envío del formulario de login
-// y la comunicación con el backend Flask.
+document.addEventListener("DOMContentLoaded", () => {
 
-document.addEventListener('DOMContentLoaded', function () {
+    console.log("Login JS cargado correctamente.");
 
-    const form = document.getElementById('login-form');
-    const tutorIdInput = document.getElementById('tutor_id');
-    const passwordInput = document.getElementById('password');
-    const messageElement = document.getElementById('message');
-    const loginButton = document.getElementById('login-button');
+    const form = document.getElementById("login-form");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const messageElement = document.getElementById("message");
+    const loginButton = document.getElementById("login-button");
 
-    // Evento de envío del formulario
-    form.addEventListener('submit', async function (event) {
-        event.preventDefault(); // Evita recargar la página
+    if (!form) {
+        console.error("ERROR: No existe el formulario con id='login-form'");
+        return;
+    }
 
-        // Limpiar mensajes y estilos previos
-        messageElement.textContent = '';
-        messageElement.className = 'text-center text-sm font-semibold h-4';
-        tutorIdInput.classList.remove('input-error');
-        passwordInput.classList.remove('input-error');
+   
+    // Detectar si es local o producción de forma automática
+    const BASE_URL = window.location.origin;
 
-        const tutor_id = tutorIdInput.value.trim();
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
-        if (!tutor_id || !password) {
-            messageElement.classList.add('text-red-600');
-            messageElement.textContent = 'Por favor, complete todos los campos.';
-            tutorIdInput.classList.add('input-error');
-            passwordInput.classList.add('input-error');
+        if (!email || !password) {
+            messageElement.textContent = "Complete todos los campos.";
             return;
         }
 
-        // Deshabilita botón mientras se verifica
         loginButton.disabled = true;
-        loginButton.textContent = 'Verificando...';
+        loginButton.textContent = "Verificando...";
 
         try {
-            // Petición POST al backend Flask
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tutor_id, password })
+            const response = await fetch(`${BASE_URL}/api/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
             });
 
             const result = await response.json();
+            console.log("Respuesta backend:", result);
 
-            if (response.ok) {
-                // ✅ Login exitoso
-                messageElement.classList.add('text-green-600');
-                messageElement.textContent = `¡Bienvenido! Rol: ${result.user.rol}`;
-                loginButton.textContent = 'Éxito ✅';
+            if (!response.ok) {
+                messageElement.textContent = result.message || "Usuario o contraseña incorrectos.";
+                loginButton.disabled = false;
+                loginButton.textContent = "Iniciar Sesión";
+                return;
+            }
 
-                // ✅ Guarda los datos del usuario localmente
-                localStorage.setItem('userData', JSON.stringify(result.user));
+            // ================================
+            //  NORMALIZAR OBJETO USUARIO
+            // ================================
+            const rol = Number(result.user.rol || result.user.id_rol);
 
-                // 🕒 Redirección al dashboard según rol
-                setTimeout(() => {
-                    console.log("Intentando redirigir...");
+            const userData = {
+                id: result.user.id || result.user.id_usuario,
+                nombre: result.user.nombre,
+                apellido: result.user.apellido,
+                email: result.user.email,
+                rol: rol,
+            };
 
-                    let destino;
+            console.log("Usuario normalizado:", userData);
 
-                    if (result.user.rol === 'administrador') {
-                        destino = `${window.location.origin}/admin`;
-                    } else if (result.user.rol === 'tutor') {
-                        destino = `${window.location.origin}/tutor`;
-                    } 
-                    else if (result.user.rol === 'estudiante') {
-                        destino = `${window.location.origin}/estudiante`;
-                    } 
-                    else if (result.user.rol === 'verificador'){
-                        destino = `${window.location.origin}/verificador`;
-                    }
-                    else {
-                        destino = `${window.location.origin}/`;
-                    }
-                    
-                    console.log("Redirigiendo a:", destino);
-                    window.location.href = destino;
-                }, 1500); // 1.5 segundos para mostrar el mensaje de éxito
+            // Guardar usuario normalizado
+            localStorage.setItem("userData", JSON.stringify(userData));
 
-            } else {
-                // ❌ Error en autenticación
-                messageElement.classList.add('text-red-600');
-                messageElement.textContent = result.message || 'Usuario o contraseña incorrectos.';
-                tutorIdInput.classList.add('input-error');
-                passwordInput.classList.add('input-error');
-                loginButton.textContent = 'Iniciar Sesión';
+            // ================================
+            //  REDIRECCIÓN SEGÚN ROL
+            // ================================
+            switch (rol) {
+                case 1:
+                    window.location.href = "/admin";
+                    break;
+                case 2:
+                    window.location.href = "/tutor";
+                    break;
+                case 3:
+                    window.location.href = "/estudiante";
+                    break;
+                case 4:
+                    window.location.href = "/verificador";
+                    break;
+                default:
+                    console.warn("ROL NO RECONOCIDO:", rol);
+                    window.location.href = "/";
             }
 
         } catch (error) {
-            console.error('Error de conexión con el servidor:', error);
-            messageElement.classList.add('text-red-600');
-            messageElement.textContent = 'No se pudo conectar al servidor Flask (Puerto 5000).';
-            loginButton.textContent = 'Iniciar Sesión';
-        } finally {
-            loginButton.disabled = false;
+            console.error("Error de conexión:", error);
+            messageElement.textContent = "No se pudo conectar al servidor.";
         }
+
+        loginButton.disabled = false;
+        loginButton.textContent = "Iniciar Sesión";
     });
 });
