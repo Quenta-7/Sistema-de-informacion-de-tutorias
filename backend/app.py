@@ -37,6 +37,8 @@ def tutor_dashboard():
         return redirect(url_for('home'))
     return send_from_directory(app.static_folder, "dashboard_tutor.html")
 
+
+
 @app.route("/estudiante")
 def estudiante_dashboard():
     # Verifica si hay sesión y si el rol es 3 (Estudiante)
