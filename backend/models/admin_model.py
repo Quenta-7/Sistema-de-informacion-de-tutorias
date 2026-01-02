@@ -87,10 +87,8 @@ def crear_usuario(nombre, apellido, email, password, id_rol):
     conn = get_connection()
     cur = conn.cursor()
     try:
-        # Encriptar contraseña
         password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-        # 1. Insertar en la tabla principal de usuarios
         sql_user = """
             INSERT INTO usuarios (nombre, apellido, email, password_hash, id_rol, fecha_registro)
             VALUES (%s, %s, %s, %s, %s, NOW())
@@ -99,13 +97,12 @@ def crear_usuario(nombre, apellido, email, password, id_rol):
         cur.execute(sql_user, (nombre, apellido, email, password_hash, id_rol))
         nuevo_id = cur.fetchone()[0]
 
-        # 2. Insertar en tablas específicas según el Rol
+        # Solo crear registros específicos para Tutor y Alumno
         if id_rol == 2:  # TUTOR
             sql_tutor = """
                 INSERT INTO tutor (id_usuario, codigo_docente, departamento_academico)
                 VALUES (%s, %s, %s);
             """
-            # Usamos valores genéricos que luego el admin puede editar
             cur.execute(sql_tutor, (nuevo_id, f"DOC-{nuevo_id}", "Sistemas"))
 
         elif id_rol == 3:  # ALUMNO
@@ -115,13 +112,8 @@ def crear_usuario(nombre, apellido, email, password, id_rol):
             """
             cur.execute(sql_alumno, (nuevo_id, f"EST-{nuevo_id}", "Ing. Informática", "1"))
 
-        elif id_rol == 4:  # VERIFICADOR
-            sql_verif = """
-                INSERT INTO verificador (id_usuario, cargo, area)
-                VALUES (%s, %s, %s);
-            """
-            cur.execute(sql_verif, (nuevo_id, "Verificador General", "Bienestar"))
-
+        # Rol 1 (Admin) y Rol 4 (Verificador) solo existen en tabla usuarios
+        
         conn.commit()
         return nuevo_id
     except Exception as e:
