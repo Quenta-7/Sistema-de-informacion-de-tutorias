@@ -205,7 +205,26 @@
       </div>
     </div>
   </div>
-
+  <div id="modal-nuevo-usuario" class="modal fixed inset-0 items-center justify-center p-4">
+    <div class="glass-card w-full max-w-md rounded-[2.5rem] p-10 relative border-sky-500/30">
+        <h2 class="text-2xl font-black text-white mb-6 text-center uppercase">Registrar Usuario</h2>
+        <div class="space-y-4">
+            <input id="reg-nombre" type="text" placeholder="Nombre" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+            <input id="reg-apellido" type="text" placeholder="Apellido" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+            <input id="reg-email" type="email" placeholder="Correo Institucional" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+            <input id="reg-pass" type="password" placeholder="Contraseña" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+            <select id="reg-rol" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-sky-500">
+                <option value="2">Tutor</option>
+                <option value="3">Alumno</option>
+                <option value="4">Verificador</option>
+            </select>
+        </div>
+        <div class="flex flex-col gap-3 mt-8">
+            <button id="btn-guardar-usuario" class="w-full py-3 bg-sky-500 text-white font-bold rounded-xl hover:bg-sky-400 transition-all">Guardar Usuario</button>
+            <button class="btn-cancelar w-full py-3 bg-slate-800 text-slate-400 font-semibold rounded-xl hover:bg-slate-700 transition-all">Cancelar</button>
+        </div>
+    </div>
+</div>
   <script>
     const API = "/api/admin";
 
