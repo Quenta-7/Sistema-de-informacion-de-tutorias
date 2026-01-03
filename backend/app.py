@@ -37,6 +37,11 @@ def tutor_dashboard():
         return redirect(url_for('home'))
     return send_from_directory(app.static_folder, "dashboard_tutor.html")
 
+@app.route("/verificador")
+def verificador_dashboard():
+    if 'user_id' not in session or session.get('rol') != 4:
+        return redirect(url_for('home'))
+    return send_from_directory(app.static_folder, "dashboard_verificador.html")
 
 
 @app.route("/estudiante")

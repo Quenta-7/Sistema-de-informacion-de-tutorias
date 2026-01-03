@@ -3,118 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Panel del Verificador - Sistema de Tutorías</title>
+  <title>Supervisión Académica - Sistema de Tutorías</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #020617;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+  </style>
 </head>
 
-<body class="min-h-screen bg-slate-950 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 text-slate-100 font-sans">
+<body class="min-h-screen text-slate-100 flex">
 
-  <div class="min-h-screen flex items-center justify-center px-4 py-6">
-    <div class="w-full max-w-6xl flex rounded-3xl border border-indigo-500/30 bg-slate-950/60 backdrop-blur-xl shadow-2xl overflow-hidden">
-
-      <aside class="w-64 border-r border-indigo-500/20 p-6 flex flex-col justify-between bg-slate-950/60">
-        <div>
-          <div class="flex items-center space-x-3 mb-10">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-xl font-bold">V</div>
-            <div>
-              <p class="text-xs uppercase tracking-widest text-indigo-400">Verificador</p>
-              <p id="user-name" class="text-sm font-semibold">Cargando...</p>
-            </div>
-          </div>
-
-          <nav class="space-y-4">
-            <button class="w-full text-left px-4 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-400/40 font-medium">
-              🔍 Consultar Tutorías
-            </button>
-          </nav>
+  <aside class="w-72 glass-card m-5 rounded-[2.5rem] flex flex-col p-8 border-white/5">
+    <div class="mb-10">
+      <div class="flex items-center gap-3 mb-12">
+        <div class="bg-gradient-to-tr from-indigo-500 to-purple-600 p-2.5 rounded-2xl shadow-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
         </div>
+        <h2 class="font-extrabold text-xl tracking-tight">Verifica<span class="text-indigo-400">TUTOR</span></h2>
+      </div>
 
-        <button id="logout-btn" class="w-full px-3 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-sm font-semibold text-white transition">
-          Cerrar sesión
+      <nav class="space-y-3">
+        <div class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-4 mb-2">Menú Principal</div>
+        <button class="w-full flex items-center gap-3 px-5 py-4 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold transition-all">
+          🔍 Consultas
         </button>
-      </aside>
-
-      <main class="flex-1 p-8 space-y-8">
-        <header>
-          <h1 class="text-3xl font-bold text-slate-50">Panel de Supervisión</h1>
-          <p class="text-slate-400 text-sm">Consulta y verifica el cumplimiento de las tutorías por fecha o semestre.</p>
-        </header>
-
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/40 p-6 rounded-2xl border border-indigo-500/10">
-          <div>
-            <label class="block text-xs uppercase text-indigo-300 mb-2">Filtrar por Fecha</label>
-            <div class="flex gap-2">
-              <input type="date" id="filter-date" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full outline-none focus:border-indigo-500">
-              <button onclick="buscarPorFecha()" class="bg-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition">Buscar</button>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs uppercase text-indigo-300 mb-2">Filtrar por Semestre</label>
-            <div class="flex gap-2">
-              <select id="filter-semestre" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm w-full outline-none focus:border-indigo-500">
-                <option value="2024-II">2024-II</option>
-                <option value="2024-I">2024-I</option>
-                <option value="2023-II">2023-II</option>
-              </select>
-              <button onclick="buscarPorSemestre()" class="bg-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition">Filtrar</button>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Registros Encontrados</h2>
-            <span id="results-count" class="text-xs bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30">0 resultados</span>
-          </div>
-
-          <div id="results-container" class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-            <p class="text-slate-500 text-center py-10">Usa los filtros para buscar registros de tutoría.</p>
-          </div>
-        </section>
-      </main>
+      </nav>
     </div>
-  </div>
+
+    <div class="mt-auto pt-6 border-t border-white/5">
+      <div class="flex items-center gap-4 p-4 mb-5 bg-slate-900/40 rounded-3xl border border-white/5">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center font-black text-white text-sm shadow-lg" id="avatar-letra">V</div>
+        <div class="overflow-hidden">
+          <p class="text-xs font-bold text-white truncate" id="user-name">Verificador</p>
+          <p class="text-[9px] text-indigo-400 font-bold uppercase tracking-widest">Supervisor</p>
+        </div>
+      </div>
+      <button id="logout-btn" class="w-full py-4 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500 hover:text-white font-bold transition-all">
+        Cerrar Sesión
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-10 overflow-y-auto">
+    <header class="mb-10">
+      <h1 class="text-4xl font-black text-white tracking-tight">Panel de Supervisión</h1>
+      <p class="text-slate-400 mt-2">Monitoreo de cumplimiento de tutorías académicas.</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+      <div class="glass-card p-8 rounded-[2.5rem] border-white/5 shadow-xl">
+        <h3 class="text-indigo-400 text-xs font-black uppercase tracking-widest mb-4">Filtrar por Jornada</h3>
+        <div class="flex gap-3">
+          <input type="date" id="filter-date" class="flex-1 bg-slate-950/50 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:border-indigo-500 outline-none transition-all">
+          <button onclick="buscarPorFecha()" class="bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-2xl text-sm font-black transition-all shadow-lg shadow-indigo-600/20">BUSCAR</button>
+        </div>
+      </div>
+
+      <div class="glass-card p-8 rounded-[2.5rem] border-white/5 shadow-xl">
+        <h3 class="text-indigo-400 text-xs font-black uppercase tracking-widest mb-4">Filtrar por Periodo</h3>
+        <div class="flex gap-3">
+          <select id="filter-semestre" class="flex-1 bg-slate-950/50 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:border-indigo-500 outline-none transition-all appearance-none">
+            <option value="2024-II">Semestre 2024-II</option>
+            <option value="2024-I">Semestre 2024-I</option>
+            <option value="2023-II">Semestre 2023-II</option>
+          </select>
+          <button onclick="buscarPorSemestre()" class="bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-2xl text-sm font-black transition-all shadow-lg shadow-indigo-600/20">FILTRAR</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="glass-card rounded-[3rem] overflow-hidden border-white/5">
+      <div class="p-8 border-b border-white/5 flex justify-between items-center bg-white/5">
+        <h2 class="text-xl font-black text-white">Registros de Tutoría</h2>
+        <span id="results-count" class="px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-black border border-indigo-500/20">0 RESULTADOS</span>
+      </div>
+
+      <div id="results-container" class="p-8 space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+        <div class="text-center py-20 text-slate-500">
+          <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <p class="font-bold uppercase tracking-widest text-xs">Sin datos para mostrar</p>
+          <p class="text-[10px] mt-1">Usa los filtros superiores para iniciar una búsqueda</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script>
-    // Inicialización y Seguridad
-    const user = JSON.parse(localStorage.getItem("userData"));
-    if (!user || user.rol !== 4) { // 4 = Verificador
-      window.location.href = "/";
-    }
-    document.getElementById("user-name").textContent = user.nombre + " " + user.apellido;
+    // Seguridad y Carga de Usuario
+    const authData = JSON.parse(localStorage.getItem("userData"));
+    if (!authData || authData.rol !== 4) window.location.href = "/";
 
-    // Logout
-    document.getElementById("logout-btn").onclick = async () => {
-      await fetch("/api/auth/logout", { method: "POST" });
-      localStorage.removeItem("userData");
-      window.location.href = "/";
-    };
+    document.getElementById("user-name").textContent = `${authData.nombre} ${authData.apellido}`;
+    document.getElementById("avatar-letra").textContent = authData.nombre[0];
 
     const container = document.getElementById("results-container");
 
     function renderTutorias(tutorias) {
       container.innerHTML = "";
-      document.getElementById("results-count").textContent = `${tutorias.length} resultados`;
+      document.getElementById("results-count").textContent = `${tutorias.length} RESULTADOS`;
       
       if (tutorias.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 text-center py-10">No se encontraron tutorías con estos criterios.</p>`;
+        container.innerHTML = `<div class="text-center py-20 text-slate-500 font-bold uppercase tracking-widest text-xs">No se encontraron registros</div>`;
         return;
       }
 
       tutorias.forEach(t => {
         const card = document.createElement("div");
-        card.className = "bg-slate-900/60 border border-slate-700 p-4 rounded-xl hover:border-indigo-500/40 transition";
+        card.className = "bg-slate-900/40 border border-white/5 p-6 rounded-3xl hover:border-indigo-500/30 transition-all group shadow-lg";
         card.innerHTML = `
           <div class="flex justify-between items-start">
-            <div>
-              <p class="text-indigo-300 text-xs font-bold uppercase mb-1">${t.tipo_tutoria || 'Tutoría'}</p>
-              <p class="text-slate-100 font-medium">Estudiante: ${t.nombre_alumno} ${t.apellido_alumno}</p>
-              <p class="text-slate-400 text-xs mt-1 italic">Obs: ${t.observaciones || 'Sin observaciones'}</p>
+            <div class="space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-400 text-[10px] font-black border border-indigo-500/10 uppercase italic">
+                  ${t.tipo || 'Tutoría Regular'}
+                </span>
+                <span class="text-slate-600 text-[10px]">•</span>
+                <span class="text-slate-400 text-[10px] font-bold uppercase">${t.fecha.split('T')[0]}</span>
+              </div>
+              <div>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Estudiante</p>
+                <p class="text-white font-extrabold text-lg">${t.alumno}</p>
+              </div>
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-white/5">
+                <p class="text-slate-500 text-[9px] font-bold uppercase mb-1">Observaciones</p>
+                <p class="text-slate-300 text-xs italic">"${t.obs || 'Sin observaciones registradas'}"</p>
+              </div>
             </div>
-            <div class="text-right">
-              <p class="text-slate-200 text-sm font-bold">${new Date(t.fecha_tutoria).toLocaleDateString()}</p>
-              <p class="text-slate-500 text-xs">Tutor: ${t.nombre_tutor || 'Asignado'}</p>
+            <div class="text-right flex flex-col justify-between h-full">
+              <div class="bg-indigo-500/5 p-3 rounded-2xl border border-indigo-500/10 inline-block">
+                <p class="text-slate-500 text-[9px] font-bold uppercase mb-1">Docente Tutor</p>
+                <p class="text-indigo-300 text-xs font-black">${t.tutor || 'No asignado'}</p>
+              </div>
             </div>
           </div>
         `;
@@ -124,7 +156,10 @@
 
     async function buscarPorFecha() {
       const fecha = document.getElementById("filter-date").value;
-      if (!fecha) return alert("Selecciona una fecha");
+      if (!fecha) return;
+      
+      container.innerHTML = `<div class="text-center py-20 text-indigo-400 font-bold animate-pulse">Consultando base de datos...</div>`;
+      
       const res = await fetch(`/api/verificador/fecha/${fecha}`);
       const data = await res.json();
       renderTutorias(data.tutorias);
@@ -132,10 +167,19 @@
 
     async function buscarPorSemestre() {
       const sem = document.getElementById("filter-semestre").value;
+      
+      container.innerHTML = `<div class="text-center py-20 text-indigo-400 font-bold animate-pulse">Filtrando periodo académico...</div>`;
+      
       const res = await fetch(`/api/verificador/semestre/${sem}`);
       const data = await res.json();
       renderTutorias(data.tutorias);
     }
+
+    document.getElementById("logout-btn").onclick = async () => {
+      await fetch("/api/auth/logout", { method: "POST" });
+      localStorage.clear();
+      window.location.href = "/";
+    };
   </script>
 </body>
 </html>
