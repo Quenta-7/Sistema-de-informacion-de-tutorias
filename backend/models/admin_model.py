@@ -40,6 +40,54 @@ def obtener_resumen():
     conn.close()
     return resultado
 
+def listar_usuarios_por_rol_paginado(id_rol, page=1, page_size=10):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    try:
+        offset = (page - 1) * page_size
+
+        cur.execute(
+            """
+            SELECT * FROM sp_listar_usuarios_por_rol_paginado(%s, %s, %s);
+            """,
+            (id_rol, page_size, offset)
+        )
+
+        rows = cur.fetchall()
+
+        if not rows:
+            return {
+                "total": 0,
+                "page": page,
+                "page_size": page_size,
+                "usuarios": []
+            }
+
+        total = rows[0][6]  # total_registros
+
+        usuarios = [
+            {
+                "id_usuario": r[0],
+                "nombre": r[1],
+                "apellido": r[2],
+                "email": r[3],
+                "nombre_rol": r[4],
+                "rol": r[5],
+            }
+            for r in rows
+        ]
+
+        return {
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "usuarios": usuarios
+        }
+
+    finally:
+        cur.close()
+        conn.close()
 
 # ====================================================
 #  LISTAR USUARIOS
@@ -48,168 +96,130 @@ def listar_usuarios():
     conn = get_connection()
     cur = conn.cursor()
 
-    sql = """
-        SELECT u.id_usuario,
-               u.nombre,
-               u.apellido,
-               u.email,
-               r.nombre_rol,
-               u.id_rol
-        FROM usuarios u
-        JOIN rol r ON r.id_rol = u.id_rol
-        ORDER BY u.id_usuario;
-    """
-
-    cur.execute(sql)
-    rows = cur.fetchall()
-
-    usuarios = [
-        {
-            "id_usuario": r[0],
-            "nombre": r[1],
-            "apellido": r[2],
-            "email": r[3],
-            "nombre_rol": r[4],
-            "rol": r[5],
-        }
-        for r in rows
-    ]
-
-    cur.close()
-    conn.close()
-    return usuarios
-
-
-# ====================================================
-#  CREAR USUARIO (ADMIN CREA NUEVOS USUARIOS)
-# ====================================================
-def crear_usuario(nombre, apellido, email, password, id_rol):
-    conn = get_connection()
-    cur = conn.cursor()
     try:
-        password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        cur.execute("SELECT * FROM sp_listar_usuarios();")
+        rows = cur.fetchall()
 
-        sql_user = """
-            INSERT INTO usuarios (nombre, apellido, email, password_hash, id_rol, fecha_registro)
-            VALUES (%s, %s, %s, %s, %s, NOW())
-            RETURNING id_usuario;
-        """
-        cur.execute(sql_user, (nombre, apellido, email, password_hash, id_rol))
-        nuevo_id = cur.fetchone()[0]
+        usuarios = [
+            {
+                "id_usuario": r[0],
+                "nombre": r[1],
+                "apellido": r[2],
+                "email": r[3],
+                "nombre_rol": r[4],
+                "rol": r[5],
+            }
+            for r in rows
+        ]
 
-        # Solo crear registros específicos para Tutor y Alumno
-        if id_rol == 2:  # TUTOR
-            sql_tutor = """
-                INSERT INTO tutor (id_usuario, codigo_docente, departamento_academico)
-                VALUES (%s, %s, %s);
-            """
-            cur.execute(sql_tutor, (nuevo_id, f"DOC-{nuevo_id}", "Sistemas"))
+        return usuarios
 
-        elif id_rol == 3:  # ALUMNO
-            sql_alumno = """
-                INSERT INTO alumno (id_usuario, codigo_estudiante, programa_estudio, semestre_actual)
-                VALUES (%s, %s, %s, %s);
-            """
-            cur.execute(sql_alumno, (nuevo_id, f"EST-{nuevo_id}", "Ing. Informática", "1"))
-
-        # Rol 1 (Admin) y Rol 4 (Verificador) solo existen en tabla usuarios
-        
-        conn.commit()
-        return nuevo_id
-    except Exception as e:
-        conn.rollback()
-        print(f"Error al crear usuario completo: {e}")
-        raise e
     finally:
         cur.close()
         conn.close()
 
 # ====================================================
+#  CREAR USUARIOS
+# ====================================================
+
+def crear_usuario(nombre, apellido, email, password, id_rol):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    try:
+        password_hash = bcrypt.hashpw(
+            password.encode("utf-8"),
+            bcrypt.gensalt()
+        ).decode("utf-8")
+
+        # 1. Crear usuario base
+        sql_usuario = """
+            SELECT sp_crear_usuario(%s, %s, %s, %s, %s);
+        """
+        cur.execute(sql_usuario, (
+            nombre,
+            apellido,
+            email,
+            password_hash,
+            id_rol
+        ))
+
+        nuevo_id = cur.fetchone()[0]
+
+        # 2. Crear registro según rol
+        sql_rol = "CALL sp_crear_usuario_por_rol(%s, %s);"
+        cur.execute(sql_rol, (nuevo_id, id_rol))
+
+        conn.commit()
+        return nuevo_id
+
+    except Exception as e:
+        conn.rollback()
+        print(f"Error al crear usuario completo: {e}")
+        raise e
+
+    finally:
+        cur.close()
+        conn.close()
+
+
+# ====================================================
 #  TUTORES DISPONIBLES
 # ====================================================
 def tutores_disponibles():
-    """
-    Devuelve todos los tutores con su nombre y código.
-    Se asume que TUTOR tiene fk hacia USUARIOS:
-    - tutor.id_usuario -> usuarios.id_usuario
-    """
     conn = get_connection()
     cur = conn.cursor()
 
-    sql = """
-        SELECT
-            t.id_tutor,
-            u.nombre,
-            u.apellido,
-            t.codigo_docente
-        FROM tutor t
-        JOIN usuarios u ON u.id_usuario = t.id_usuario
-        ORDER BY u.nombre;
-    """
+    try:
+        sql = "SELECT * FROM sp_tutores_disponibles();"
+        cur.execute(sql)
+        rows = cur.fetchall()
 
-    cur.execute(sql)
-    rows = cur.fetchall()
+        tutores = [
+            {
+                "id_tutor": r[0],
+                "nombre": r[1],
+                "apellido": r[2],
+                "codigo_docente": r[3],
+            }
+            for r in rows
+        ]
 
-    tutores = [
-        {
-            "id_tutor": r[0],
-            "nombre": r[1],
-            "apellido": r[2],
-            "codigo_docente": r[3],
-        }
-        for r in rows
-    ]
+        return tutores
 
-    cur.close()
-    conn.close()
-    return tutores
-
+    finally:
+        cur.close()
+        conn.close()
 
 # ====================================================
-#  ALUMNOS SIN TUTOR ASIGNADO
+#  ALUMNOS DISPONIBLES
 # ====================================================
+
 def alumnos_disponibles():
-    """
-    Alumnos que NO tienen todavía solicitud de tutoría (no están asignados).
-    Se asume:
-    - alumno.id_usuario -> usuarios.id_usuario
-    - solicitud.id_alumno referencia alumno.id_alumno
-    """
     conn = get_connection()
     cur = conn.cursor()
 
-    sql = """
-        SELECT
-            a.id_alumno,
-            u.nombre,
-            u.apellido,
-            a.codigo_estudiante
-        FROM alumno a
-        JOIN usuarios u ON u.id_usuario = a.id_usuario
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM solicitud s
-            WHERE s.id_alumno = a.id_alumno
-        )
-        ORDER BY u.nombre;
-    """
+    try:
+        sql = "SELECT * FROM sp_alumnos_disponibles();"
+        cur.execute(sql)
+        rows = cur.fetchall()
 
-    cur.execute(sql)
-    rows = cur.fetchall()
+        alumnos = [
+            {
+                "id_alumno": r[0],
+                "nombre": r[1],
+                "apellido": r[2],
+                "codigo_estudiante": r[3],
+            }
+            for r in rows
+        ]
 
-    alumnos = [
-        {
-            "id_alumno": r[0],
-            "nombre": r[1],
-            "apellido": r[2],
-            "codigo_estudiante": r[3],
-        }
-        for r in rows
-    ]
+        return alumnos
 
-    cur.close()
-    conn.close()
-    return alumnos
+    finally:
+        cur.close()
+        conn.close()
+
 
 
 # ====================================================
