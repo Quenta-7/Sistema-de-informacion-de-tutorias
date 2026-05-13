@@ -16,4 +16,5 @@ boton = driver.find_element(By.TAG_NAME, "button")
 print("Elementos encontrados correctamente.")
 
 time.sleep(1)
-driver.quit()
+    driver.quit()
+        
